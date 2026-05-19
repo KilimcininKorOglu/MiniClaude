@@ -7,18 +7,24 @@ import (
 	"time"
 
 	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/auth"
+	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/device"
+	settingssync "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/sync"
+	syncws "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/ws"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Server struct {
-	pool        *pgxpool.Pool
-	mux         *http.ServeMux
-	authService *auth.Service
-	cookies     auth.CookieConfig
+	pool          *pgxpool.Pool
+	mux           *http.ServeMux
+	authService   *auth.Service
+	deviceService *device.Service
+	syncService   *settingssync.Service
+	hub           *syncws.Hub
+	cookies       auth.CookieConfig
 }
 
-func New(pool *pgxpool.Pool, authService *auth.Service, cookies auth.CookieConfig) http.Handler {
-	server := &Server{pool: pool, mux: http.NewServeMux(), authService: authService, cookies: cookies}
+func New(pool *pgxpool.Pool, authService *auth.Service, deviceService *device.Service, syncService *settingssync.Service, hub *syncws.Hub, cookies auth.CookieConfig) http.Handler {
+	server := &Server{pool: pool, mux: http.NewServeMux(), authService: authService, deviceService: deviceService, syncService: syncService, hub: hub, cookies: cookies}
 	server.routes()
 	return server.mux
 }
@@ -40,6 +46,12 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("POST /auth/login", s.login)
 	s.mux.HandleFunc("POST /auth/logout", s.logout)
 	s.mux.HandleFunc("GET /me", s.me)
+	s.mux.HandleFunc("POST /api/device/start", s.deviceStart)
+	s.mux.HandleFunc("POST /api/device/approve", s.deviceApprove)
+	s.mux.HandleFunc("POST /api/device/poll", s.devicePoll)
+	s.mux.HandleFunc("GET /api/settings/snapshot", s.settingsSnapshot)
+	s.mux.HandleFunc("POST /api/settings/push", s.settingsPush)
+	s.mux.HandleFunc("GET /api/sync/ws", s.syncWebSocket)
 }
 
 func (s *Server) health(w http.ResponseWriter, r *http.Request) {

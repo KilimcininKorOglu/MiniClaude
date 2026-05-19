@@ -15,7 +15,10 @@ import (
 	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/config"
 	providercrypto "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/crypto"
 	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/db"
+	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/device"
 	serverhttp "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/http"
+	settingssync "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/sync"
+	syncws "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/ws"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -72,11 +75,18 @@ func serve(cfg config.Config, pool *pgxpool.Pool) error {
 	if _, err := providercrypto.NewSecretBox(cfg.ProviderSecretMasterKey); err != nil {
 		return err
 	}
+	clientTokenManager, err := device.NewClientTokenManager(cfg.JWTSecret, 30*24*time.Hour)
+	if err != nil {
+		return err
+	}
 	authService := auth.NewService(auth.NewStore(pool), tokenManager)
+	deviceService := device.NewService(device.NewStore(pool), clientTokenManager, cfg.AppURL)
+	syncService := settingssync.NewService(settingssync.NewStore(pool))
+	hub := syncws.NewHub()
 
 	server := &http.Server{
 		Addr:              cfg.Addr,
-		Handler:           serverhttp.New(pool, authService, auth.CookieConfig{Secure: cfg.CookieSecure}),
+		Handler:           serverhttp.New(pool, authService, deviceService, syncService, hub, auth.CookieConfig{Secure: cfg.CookieSecure}),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 

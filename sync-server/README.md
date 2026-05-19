@@ -50,6 +50,17 @@ The initial server-rendered Web UI exposes:
 
 Form submissions use same-origin POST routes and store the JWT only in the `miniclaude_sync_session` cookie.
 
+## Sync API
+
+The initial sync API exposes:
+
+- `POST /api/device/start` to create a device-code login request.
+- `POST /api/device/approve` to approve a user code from an authenticated web session.
+- `POST /api/device/poll` to exchange an approved device code for a client access token.
+- `GET /api/settings/snapshot` to read the workspace settings document.
+- `POST /api/settings/push` to update settings with base-version checking; stale writes return `409` with `version_reject`.
+- `GET /api/sync/ws` for client WebSocket sync using a bearer client token.
+
 ## Auth API
 
 The initial JSON auth API exposes:
