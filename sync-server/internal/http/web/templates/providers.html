@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · MiniClaude Sync</title>
+  <link rel="stylesheet" href="/web/static/app.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/dashboard">MiniClaude Sync</a>
+    <nav>
+      <a aria-current="page" href="/providers">Providers</a>
+      <a href="/clients">Clients</a>
+      <form method="post" action="/ui/logout" hx-boost="true"><button class="link-button" type="submit">Log out</button></form>
+    </nav>
+  </header>
+  <main class="shell">
+    <section class="hero-panel">
+      <p class="eyebrow">Providers</p>
+      <h1>Provider management</h1>
+      <p class="muted">Provider CRUD will use encrypted secret storage and workspace-scoped settings events.</p>
+    </section>
+    <section class="empty-state">
+      <h2>No providers yet</h2>
+      <p>Provider forms will be connected in the next server-side management step.</p>
+    </section>
+  </main>
+</body>
+</html>

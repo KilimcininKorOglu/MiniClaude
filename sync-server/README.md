@@ -40,6 +40,16 @@ make migrate-down
 | `SYNC_SERVER_MIGRATIONS_DIR` | Directory containing SQL migration files. |
 | `DATABASE_URL` | PostgreSQL connection URL. |
 
+## Web UI
+
+The initial server-rendered Web UI exposes:
+
+- `GET /login` and `GET /signup` for browser auth.
+- `GET /dashboard` for the authenticated workspace landing page.
+- `GET /providers` and `GET /clients` as authenticated management pages.
+
+Form submissions use same-origin POST routes and store the JWT only in the `miniclaude_sync_session` cookie.
+
 ## Auth API
 
 The initial JSON auth API exposes:

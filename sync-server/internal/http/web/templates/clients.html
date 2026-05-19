@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · MiniClaude Sync</title>
+  <link rel="stylesheet" href="/web/static/app.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/dashboard">MiniClaude Sync</a>
+    <nav>
+      <a href="/providers">Providers</a>
+      <a aria-current="page" href="/clients">Clients</a>
+      <form method="post" action="/ui/logout" hx-boost="true"><button class="link-button" type="submit">Log out</button></form>
+    </nav>
+  </header>
+  <main class="shell">
+    <section class="hero-panel">
+      <p class="eyebrow">Clients</p>
+      <h1>Client sessions</h1>
+      <p class="muted">Linked MiniClaude clients and targeted termination controls will appear here after the device and WebSocket phases.</p>
+    </section>
+    <section class="empty-state">
+      <h2>No clients linked</h2>
+      <p>Use the upcoming MiniClaude <code>/login</code> command to link clients to this workspace.</p>
+    </section>
+  </main>
+</body>
+</html>

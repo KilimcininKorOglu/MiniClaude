@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · MiniClaude Sync</title>
+  <link rel="stylesheet" href="/web/static/app.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/dashboard">MiniClaude Sync</a>
+    <nav>
+      <a href="/providers">Providers</a>
+      <a href="/clients">Clients</a>
+      <form method="post" action="/ui/logout" hx-boost="true"><button class="link-button" type="submit">Log out</button></form>
+    </nav>
+  </header>
+  <main class="shell">
+    <section class="hero-panel">
+      <p class="eyebrow">Workspace</p>
+      <h1>Welcome, {{.Principal.Username}}</h1>
+      <p class="muted">Signed in as {{.Principal.Email}} with {{.Principal.Role}} access.</p>
+    </section>
+    <section class="grid">
+      <a class="tile" href="/providers">
+        <h2>Providers</h2>
+        <p>Configure provider metadata and encrypted API secrets.</p>
+      </a>
+      <a class="tile" href="/clients">
+        <h2>Clients</h2>
+        <p>Review linked MiniClaude clients and prepare session controls.</p>
+      </a>
+      <div class="tile">
+        <h2>Settings sync</h2>
+        <p>Versioned workspace settings will appear here as the sync API lands.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

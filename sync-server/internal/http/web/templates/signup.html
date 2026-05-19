@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · MiniClaude Sync</title>
+  <link rel="stylesheet" href="/web/static/app.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body class="auth-page">
+  <main class="auth-card wide">
+    <p class="eyebrow">MiniClaude Sync</p>
+    <h1>Create account</h1>
+    <p class="muted">Your first workspace is created automatically.</p>
+    {{if .Error}}<div class="alert">{{.Error}}</div>{{end}}
+    <form method="post" action="/ui/signup" class="stack" hx-boost="true">
+      <label>
+        Email
+        <input name="email" type="email" autocomplete="email" required>
+      </label>
+      <label>
+        Username
+        <input name="username" autocomplete="username" required>
+      </label>
+      <label>
+        Workspace name
+        <input name="workspace_name" autocomplete="organization" required>
+      </label>
+      <label>
+        Password
+        <input name="password" type="password" autocomplete="new-password" minlength="12" required>
+      </label>
+      <button type="submit">Create account</button>
+    </form>
+    <p class="muted">Already have an account? <a href="/login">Log in</a>.</p>
+  </main>
+</body>
+</html>
