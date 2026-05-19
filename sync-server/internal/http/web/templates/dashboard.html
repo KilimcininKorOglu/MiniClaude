@@ -12,6 +12,7 @@
     <a class="brand" href="/dashboard">MiniClaude Sync</a>
     <nav>
       <a href="/providers">Providers</a>
+      <a href="/settings">Settings</a>
       <a href="/clients">Clients</a>
       <form method="post" action="/ui/logout" hx-boost="true"><button class="link-button" type="submit">Log out</button></form>
     </nav>
@@ -22,19 +23,52 @@
       <h1>Welcome, {{.Principal.Username}}</h1>
       <p class="muted">Signed in as {{.Principal.Email}} with {{.Principal.Role}} access.</p>
     </section>
+
+    {{if .Error}}<section class="alert">{{.Error}}</section>{{end}}
+
     <section class="grid">
       <a class="tile" href="/providers">
         <h2>Providers</h2>
         <p>Configure provider metadata and encrypted API secrets.</p>
       </a>
+      <a class="tile" href="/settings">
+        <h2>Settings sync</h2>
+        <p>Edit the versioned workspace settings document.</p>
+      </a>
       <a class="tile" href="/clients">
         <h2>Clients</h2>
-        <p>Review linked MiniClaude clients and prepare session controls.</p>
+        <p>Review linked MiniClaude clients and terminate sessions.</p>
       </a>
-      <div class="tile">
-        <h2>Settings sync</h2>
-        <p>Versioned workspace settings will appear here as the sync API lands.</p>
-      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Audit events</h2>
+      {{if .AuditEvents}}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Actor</th>
+                <th>Event</th>
+                <th>Metadata</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range .AuditEvents}}
+                <tr>
+                  <td>{{.CreatedAt}}</td>
+                  <td>{{.ActorType}}</td>
+                  <td>{{.EventType}}</td>
+                  <td><code>{{.Metadata}}</code></td>
+                </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+      {{else}}
+        <p class="muted">No audit events recorded yet.</p>
+      {{end}}
     </section>
   </main>
 </body>

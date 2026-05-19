@@ -9,7 +9,7 @@ import (
 )
 
 func TestUnknownRouteReturnsNotFound(t *testing.T) {
-	handler := New(nil, nil, nil, nil, nil, auth.CookieConfig{})
+	handler := New(nil, nil, nil, nil, nil, nil, auth.CookieConfig{})
 	request := httptest.NewRequest(http.MethodGet, "/missing", nil)
 	response := httptest.NewRecorder()
 
@@ -21,7 +21,7 @@ func TestUnknownRouteReturnsNotFound(t *testing.T) {
 }
 
 func TestMeRequiresSessionCookie(t *testing.T) {
-	handler := New(nil, nil, nil, nil, nil, auth.CookieConfig{})
+	handler := New(nil, nil, nil, nil, nil, nil, auth.CookieConfig{})
 	request := httptest.NewRequest(http.MethodGet, "/me", nil)
 	response := httptest.NewRecorder()
 
@@ -33,7 +33,7 @@ func TestMeRequiresSessionCookie(t *testing.T) {
 }
 
 func TestLoginPageRenders(t *testing.T) {
-	handler := New(nil, nil, nil, nil, nil, auth.CookieConfig{})
+	handler := New(nil, nil, nil, nil, nil, nil, auth.CookieConfig{})
 	request := httptest.NewRequest(http.MethodGet, "/login", nil)
 	response := httptest.NewRecorder()
 
@@ -48,7 +48,7 @@ func TestLoginPageRenders(t *testing.T) {
 }
 
 func TestDashboardRedirectsWithoutSession(t *testing.T) {
-	handler := New(nil, nil, nil, nil, nil, auth.CookieConfig{})
+	handler := New(nil, nil, nil, nil, nil, nil, auth.CookieConfig{})
 	request := httptest.NewRequest(http.MethodGet, "/dashboard", nil)
 	response := httptest.NewRecorder()
 

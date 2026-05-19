@@ -8,6 +8,7 @@ import (
 
 	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/auth"
 	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/device"
+	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/providers"
 	settingssync "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/sync"
 	syncws "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/ws"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -19,12 +20,13 @@ type Server struct {
 	authService   *auth.Service
 	deviceService *device.Service
 	syncService   *settingssync.Service
+	providerStore *providers.Store
 	hub           *syncws.Hub
 	cookies       auth.CookieConfig
 }
 
-func New(pool *pgxpool.Pool, authService *auth.Service, deviceService *device.Service, syncService *settingssync.Service, hub *syncws.Hub, cookies auth.CookieConfig) http.Handler {
-	server := &Server{pool: pool, mux: http.NewServeMux(), authService: authService, deviceService: deviceService, syncService: syncService, hub: hub, cookies: cookies}
+func New(pool *pgxpool.Pool, authService *auth.Service, deviceService *device.Service, syncService *settingssync.Service, providerStore *providers.Store, hub *syncws.Hub, cookies auth.CookieConfig) http.Handler {
+	server := &Server{pool: pool, mux: http.NewServeMux(), authService: authService, deviceService: deviceService, syncService: syncService, providerStore: providerStore, hub: hub, cookies: cookies}
 	server.routes()
 	return server.mux
 }
@@ -37,7 +39,13 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /signup", s.signupPage)
 	s.mux.HandleFunc("GET /dashboard", s.dashboardPage)
 	s.mux.HandleFunc("GET /providers", s.providersPage)
+	s.mux.HandleFunc("POST /ui/providers", s.providerSaveForm)
+	s.mux.HandleFunc("POST /ui/providers/delete", s.providerDeleteForm)
+	s.mux.HandleFunc("GET /settings", s.settingsPage)
+	s.mux.HandleFunc("POST /ui/settings", s.settingsSaveForm)
 	s.mux.HandleFunc("GET /clients", s.clientsPage)
+	s.mux.HandleFunc("POST /ui/clients/revoke", s.clientRevokeForm)
+	s.mux.HandleFunc("POST /ui/client-sessions/terminate", s.clientSessionTerminateForm)
 	s.mux.HandleFunc("GET /device", s.devicePage)
 	s.mux.HandleFunc("POST /device", s.deviceApproveForm)
 	s.mux.HandleFunc("GET /web/static/", s.staticFile)

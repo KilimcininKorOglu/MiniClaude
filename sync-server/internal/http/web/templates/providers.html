@@ -12,6 +12,7 @@
     <a class="brand" href="/dashboard">MiniClaude Sync</a>
     <nav>
       <a aria-current="page" href="/providers">Providers</a>
+      <a href="/settings">Settings</a>
       <a href="/clients">Clients</a>
       <form method="post" action="/ui/logout" hx-boost="true"><button class="link-button" type="submit">Log out</button></form>
     </nav>
@@ -20,12 +21,83 @@
     <section class="hero-panel">
       <p class="eyebrow">Providers</p>
       <h1>Provider management</h1>
-      <p class="muted">Provider CRUD will use encrypted secret storage and workspace-scoped settings events.</p>
+      <p class="muted">Create and update workspace providers. Secrets are stored encrypted and shown only as a masked state.</p>
     </section>
-    <section class="empty-state">
-      <h2>No providers yet</h2>
-      <p>Provider forms will be connected in the next server-side management step.</p>
+
+    {{if .Error}}<section class="alert">{{.Error}}</section>{{end}}
+
+    <section class="panel">
+      <h2>Add or update provider</h2>
+      <form method="post" action="/ui/providers" class="stack" hx-boost="true">
+        <div class="form-grid">
+          <label>Provider name<input name="name" placeholder="deepseek" required></label>
+          <label>Base URL<input name="base_url" placeholder="https://api.example.com/anthropic"></label>
+          <label>Model<input name="model" placeholder="model-name"></label>
+          <label>Description<input name="description" placeholder="Internal default provider"></label>
+          <label>Default Sonnet<input name="default_sonnet" placeholder="sonnet model"></label>
+          <label>Default Haiku<input name="default_haiku" placeholder="haiku model"></label>
+          <label>Default Opus<input name="default_opus" placeholder="opus model"></label>
+          <label>API secret<input name="secret" type="password" autocomplete="new-password" placeholder="Leave blank to keep current secret"></label>
+        </div>
+        <button type="submit">Save provider</button>
+      </form>
     </section>
+
+    {{if .Providers}}
+      <section class="panel">
+        <h2>Configured providers</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Model</th>
+                <th>Base URL</th>
+                <th>Secret</th>
+                <th>Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range .Providers}}
+                <tr>
+                  <td><strong>{{.Name}}</strong><br><span class="muted">{{.Description}}</span></td>
+                  <td>{{.Model}}</td>
+                  <td><code>{{.BaseURL}}</code></td>
+                  <td>{{if .HasSecret}}Stored{{else}}Missing{{end}}</td>
+                  <td>{{.UpdatedAt}}</td>
+                  <td>
+                    <details>
+                      <summary>Edit</summary>
+                      <form method="post" action="/ui/providers" class="stack compact" hx-boost="true">
+                        <input name="name" value="{{.Name}}" required>
+                        <input name="base_url" value="{{.BaseURL}}" placeholder="Base URL">
+                        <input name="model" value="{{.Model}}" placeholder="Model">
+                        <input name="description" value="{{.Description}}" placeholder="Description">
+                        <input name="default_sonnet" value="{{.DefaultSonnet}}" placeholder="Default Sonnet">
+                        <input name="default_haiku" value="{{.DefaultHaiku}}" placeholder="Default Haiku">
+                        <input name="default_opus" value="{{.DefaultOpus}}" placeholder="Default Opus">
+                        <input name="secret" type="password" autocomplete="new-password" placeholder="New secret">
+                        <button type="submit">Update</button>
+                      </form>
+                    </details>
+                    <form method="post" action="/ui/providers/delete" hx-boost="true">
+                      <input type="hidden" name="provider_id" value="{{.ID}}">
+                      <button class="danger-button" type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {{else}}
+      <section class="empty-state">
+        <h2>No providers yet</h2>
+        <p>Add the first provider above to sync it to linked MiniClaude clients.</p>
+      </section>
+    {{end}}
   </main>
 </body>
 </html>

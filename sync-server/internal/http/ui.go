@@ -13,12 +13,19 @@ import (
 var uiFiles embed.FS
 
 type pageData struct {
-	Title     string
-	Principal auth.Principal
-	Error     string
-	Next      string
-	UserCode  string
-	ClientID  string
+	Title            string
+	Principal        auth.Principal
+	Error            string
+	Notice           string
+	Next             string
+	UserCode         string
+	ClientID         string
+	Providers        []providerView
+	Clients          []clientView
+	SettingsDocument string
+	SettingsVersion  int64
+	SettingsChecksum string
+	AuditEvents      []auditEventView
 }
 
 func (s *Server) templates() (*template.Template, error) {
@@ -75,7 +82,12 @@ func (s *Server) dashboardPage(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	s.render(w, http.StatusOK, "dashboard.html", pageData{Title: "Dashboard", Principal: principal})
+	events, err := s.auditEvents(r.Context(), principal.WorkspaceID)
+	if err != nil {
+		s.render(w, http.StatusBadRequest, "dashboard.html", pageData{Title: "Dashboard", Principal: principal, Error: err.Error()})
+		return
+	}
+	s.render(w, http.StatusOK, "dashboard.html", pageData{Title: "Dashboard", Principal: principal, AuditEvents: events})
 }
 
 func (s *Server) providersPage(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +95,12 @@ func (s *Server) providersPage(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	s.render(w, http.StatusOK, "providers.html", pageData{Title: "Providers", Principal: principal})
+	providers, err := s.providerViews(r.Context(), principal.WorkspaceID)
+	if err != nil {
+		s.render(w, http.StatusBadRequest, "providers.html", pageData{Title: "Providers", Principal: principal, Error: err.Error()})
+		return
+	}
+	s.render(w, http.StatusOK, "providers.html", pageData{Title: "Providers", Principal: principal, Providers: providers})
 }
 
 func (s *Server) clientsPage(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +108,12 @@ func (s *Server) clientsPage(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	s.render(w, http.StatusOK, "clients.html", pageData{Title: "Clients", Principal: principal})
+	clients, err := s.clientViews(r.Context(), principal.WorkspaceID)
+	if err != nil {
+		s.render(w, http.StatusBadRequest, "clients.html", pageData{Title: "Clients", Principal: principal, Error: err.Error()})
+		return
+	}
+	s.render(w, http.StatusOK, "clients.html", pageData{Title: "Clients", Principal: principal, Clients: clients})
 }
 
 func (s *Server) devicePage(w http.ResponseWriter, r *http.Request) {

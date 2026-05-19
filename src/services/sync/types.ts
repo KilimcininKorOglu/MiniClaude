@@ -28,6 +28,7 @@ export type SyncCredentials = {
   accessToken: string
   expiresAt: string
   settingsVersion?: number
+  sessionID?: string
 }
 
 export type SyncMessage = {

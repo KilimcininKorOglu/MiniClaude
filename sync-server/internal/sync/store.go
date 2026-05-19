@@ -7,12 +7,14 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/providers"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Store struct {
-	pool *pgxpool.Pool
+	pool          *pgxpool.Pool
+	providerStore *providers.Store
 }
 
 type Snapshot struct {
@@ -27,8 +29,12 @@ type PushResult struct {
 	Snapshot Snapshot `json:"snapshot"`
 }
 
-func NewStore(pool *pgxpool.Pool) *Store {
-	return &Store{pool: pool}
+func NewStore(pool *pgxpool.Pool, providerStore ...*providers.Store) *Store {
+	store := &Store{pool: pool}
+	if len(providerStore) > 0 {
+		store.providerStore = providerStore[0]
+	}
+	return store
 }
 
 func (s *Store) Snapshot(ctx context.Context, workspaceID string) (Snapshot, error) {
@@ -43,6 +49,14 @@ func (s *Store) Snapshot(ctx context.Context, workspaceID string) (Snapshot, err
 			return Snapshot{}, fmt.Errorf("settings document not found")
 		}
 		return Snapshot{}, fmt.Errorf("read settings snapshot: %w", err)
+	}
+	if s.providerStore != nil {
+		document, err := s.withProviders(ctx, workspaceID, snapshot.Document)
+		if err != nil {
+			return Snapshot{}, err
+		}
+		snapshot.Document = document
+		snapshot.Checksum = checksum(document)
 	}
 	return snapshot, nil
 }
@@ -72,6 +86,14 @@ func (s *Store) Push(ctx context.Context, workspaceID, userID string, baseVersio
 	}
 
 	if current.Version != baseVersion {
+		if s.providerStore != nil {
+			document, err := s.withProviders(ctx, workspaceID, current.Document)
+			if err != nil {
+				return PushResult{}, err
+			}
+			current.Document = document
+			current.Checksum = checksum(document)
+		}
 		return PushResult{Accepted: false, Snapshot: current}, nil
 	}
 
@@ -97,7 +119,36 @@ func (s *Store) Push(ctx context.Context, workspaceID, userID string, baseVersio
 	if err := tx.Commit(ctx); err != nil {
 		return PushResult{}, fmt.Errorf("commit settings push transaction: %w", err)
 	}
+	if s.providerStore != nil {
+		document, err := s.withProviders(ctx, workspaceID, next.Document)
+		if err != nil {
+			return PushResult{}, err
+		}
+		next.Document = document
+		next.Checksum = checksum(document)
+	}
 	return PushResult{Accepted: true, Snapshot: next}, nil
+}
+
+func (s *Store) withProviders(ctx context.Context, workspaceID string, document json.RawMessage) (json.RawMessage, error) {
+	merged := map[string]any{}
+	if len(document) > 0 {
+		if err := json.Unmarshal(document, &merged); err != nil {
+			return nil, fmt.Errorf("decode settings document: %w", err)
+		}
+	}
+	providers, err := s.providerStore.SettingsProviders(ctx, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	if len(providers) > 0 {
+		merged["providers"] = providers
+	}
+	encoded, err := json.Marshal(merged)
+	if err != nil {
+		return nil, fmt.Errorf("encode settings document: %w", err)
+	}
+	return encoded, nil
 }
 
 func checksum(document []byte) string {

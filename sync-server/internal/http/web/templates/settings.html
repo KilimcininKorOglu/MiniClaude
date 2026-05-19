@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · MiniClaude Sync</title>
+  <link rel="stylesheet" href="/web/static/app.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/dashboard">MiniClaude Sync</a>
+    <nav>
+      <a href="/providers">Providers</a>
+      <a aria-current="page" href="/settings">Settings</a>
+      <a href="/clients">Clients</a>
+      <form method="post" action="/ui/logout" hx-boost="true"><button class="link-button" type="submit">Log out</button></form>
+    </nav>
+  </header>
+  <main class="shell">
+    <section class="hero-panel">
+      <p class="eyebrow">Settings</p>
+      <h1>Workspace settings</h1>
+      <p class="muted">Edit the canonical workspace settings document. Stale saves are rejected with the current version.</p>
+      <p class="muted">Version: <code>{{.SettingsVersion}}</code> · Checksum: <code>{{.SettingsChecksum}}</code></p>
+    </section>
+
+    {{if .Error}}<section class="alert">{{.Error}}</section>{{end}}
+    {{if .Notice}}<section class="notice">{{.Notice}}</section>{{end}}
+
+    <section class="panel">
+      <form method="post" action="/ui/settings" class="stack" hx-boost="true">
+        <input type="hidden" name="base_version" value="{{.SettingsVersion}}">
+        <label>
+          Settings JSON
+          <textarea name="document" spellcheck="false" rows="22">{{.SettingsDocument}}</textarea>
+        </label>
+        <button type="submit">Save settings</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
