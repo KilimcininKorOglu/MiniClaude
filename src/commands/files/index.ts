@@ -3,7 +3,7 @@ import type { Command } from '../../commands.js'
 const files = {
   type: 'local',
   name: 'files',
-  description: '列出当前上下文中的所有文件',
+  description: 'List all files in the current context',
   isEnabled: () => process.env.USER_TYPE === 'ant',
   supportsNonInteractive: true,
   load: () => import('./files.js'),

@@ -10,7 +10,7 @@ export default function Comparison() {
   return (
     <section ref={ref} className="relative py-32 px-6 border-t border-white/10">
       <div className="max-w-7xl mx-auto">
-        {/* 标题 */}
+        {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -27,7 +27,7 @@ export default function Comparison() {
           </h2>
         </motion.div>
 
-        {/* 对比表格 */}
+        {/* Comparison table */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}

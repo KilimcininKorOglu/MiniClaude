@@ -1,69 +1,69 @@
 import MarkdownDoc, { DocStyles } from '../../components/MarkdownDoc'
 
 const toc = [
-  { id: 'required', text: '必需变量', level: 2 as const },
-  { id: 'model', text: '模型配置', level: 2 as const },
-  { id: 'cache', text: '缓存配置', level: 2 as const },
-  { id: 'debug', text: '调试选项', level: 2 as const },
-  { id: 'advanced', text: '高级配置', level: 2 as const },
+  { id: 'required', text: 'Required Variables', level: 2 as const },
+  { id: 'model', text: 'Model Configuration', level: 2 as const },
+  { id: 'cache', text: 'Caching Configuration', level: 2 as const },
+  { id: 'debug', text: 'Debug Options', level: 2 as const },
+  { id: 'advanced', text: 'Advanced Configuration', level: 2 as const },
 ]
 
 const rows = (vars: [string, string, string][]) =>
   vars.map(([name, required, desc]) => (
     <tr key={name}>
       <td><code>{name}</code></td>
-      <td><span className={`badge ${required === '必需' ? 'badge-red' : 'badge-green'}`}>{required}</span></td>
+      <td><span className={`badge ${required === 'Required' ? 'badge-red' : required === 'Recommended' ? 'badge-yellow' : 'badge-green'}`}>{required}</span></td>
       <td>{desc}</td>
     </tr>
   ))
 
 export default function EnvVars() {
   return (
-    <MarkdownDoc title="环境变量" description="MiniClaude 支持的所有环境变量及用法说明" toc={toc} content={<>
+    <MarkdownDoc title="Environment Variables" description="Every supported MiniClaude environment variable and how to use it." toc={toc} content={<>
       <DocStyles />
-      <h2 id="required">必需变量</h2>
-      <table><thead><tr><th>变量名</th><th>必需</th><th>说明</th></tr></thead>
+      <h2 id="required">Required Variables</h2>
+      <table><thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
       <tbody>{rows([
-        ['ANTHROPIC_API_KEY', '必需', 'API 密钥。使用 Anthropic 官方填 sk-ant-xxx，使用 DeepSeek 等第三方填对应的 key'],
-        ['ANTHROPIC_BASE_URL', '可选', '自定义 API 端点。不设则使用 Anthropic 官方 API'],
+        ['ANTHROPIC_API_KEY', 'Required', 'API key. Use an sk-ant-xxx key for Anthropic, or the provider-specific key for DeepSeek and other third-party services.'],
+        ['ANTHROPIC_BASE_URL', 'Optional', 'Custom API endpoint. Leave unset to use the official Anthropic API.'],
       ])}</tbody></table>
 
-      <h2 id="model">模型配置</h2>
-      <table><thead><tr><th>变量名</th><th>必需</th><th>说明</th></tr></thead>
+      <h2 id="model">Model Configuration</h2>
+      <table><thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
       <tbody>{rows([
-        ['ANTHROPIC_MODEL', '可选', '默认模型。可选：claude-sonnet-4-6, claude-opus-4-6, deepseek-v4-pro 等'],
-        ['ANTHROPIC_SMALL_FAST_MODEL', '可选', '快速任务模型，默认 claude-haiku-4-5'],
+        ['ANTHROPIC_MODEL', 'Optional', 'Default model, such as claude-sonnet-4-6, claude-opus-4-6, or deepseek-v4-pro.'],
+        ['ANTHROPIC_SMALL_FAST_MODEL', 'Optional', 'Fast-task model. Defaults to claude-haiku-4-5.'],
       ])}</tbody></table>
 
-      <h2 id="cache">缓存配置</h2>
-      <p>Prompt Caching 可大幅降低 API 费用（30-50%）。MiniClaude 默认启用 5 分钟 TTL 缓存，通过环境变量可升级为 1 小时。</p>
-      <table><thead><tr><th>变量名</th><th>必需</th><th>说明</th></tr></thead>
+      <h2 id="cache">Caching Configuration</h2>
+      <p>Prompt caching can reduce API cost significantly. MiniClaude enables a five-minute TTL cache by default, and you can extend it to one hour with an environment variable.</p>
+      <table><thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
       <tbody>{rows([
-        ['ENABLE_PROMPT_CACHING_1H', '推荐', '启用 1 小时缓存 TTL（默认 5 分钟）。<strong>强烈推荐</strong>，可显著降低 API 费用'],
-        ['DISABLE_PROMPT_CACHING', '可选', '完全禁用 Prompt Caching。不推荐'],
-        ['DISABLE_PROMPT_CACHING_HAIKU', '可选', '仅对 Haiku 模型禁用缓存'],
-        ['DISABLE_PROMPT_CACHING_SONNET', '可选', '仅对 Sonnet 模型禁用缓存'],
-        ['DISABLE_PROMPT_CACHING_OPUS', '可选', '仅对 Opus 模型禁用缓存'],
+        ['ENABLE_PROMPT_CACHING_1H', 'Recommended', 'Enable a one-hour cache TTL instead of the default five minutes. Strongly recommended when you want lower API cost.'],
+        ['DISABLE_PROMPT_CACHING', 'Optional', 'Disable prompt caching entirely. Not recommended.'],
+        ['DISABLE_PROMPT_CACHING_HAIKU', 'Optional', 'Disable caching only for Haiku models.'],
+        ['DISABLE_PROMPT_CACHING_SONNET', 'Optional', 'Disable caching only for Sonnet models.'],
+        ['DISABLE_PROMPT_CACHING_OPUS', 'Optional', 'Disable caching only for Opus models.'],
       ])}</tbody></table>
 
-      <h2 id="debug">调试选项</h2>
-      <table><thead><tr><th>变量名</th><th>必需</th><th>说明</th></tr></thead>
+      <h2 id="debug">Debug Options</h2>
+      <table><thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
       <tbody>{rows([
-        ['DEBUG', '可选', '启用调试日志。设为 * 显示全部，或指定模块如 DEBUG=api,cli'],
-        ['CLAUDE_CODE_FORCE_RECOVERY_CLI', '可选', '强制使用纯文本降级模式，解决 Ink TUI 问题'],
+        ['DEBUG', 'Optional', 'Enable debug logs. Set it to * for everything, or choose modules such as DEBUG=api,cli.'],
+        ['CLAUDE_CODE_FORCE_RECOVERY_CLI', 'Optional', 'Force the plain-text recovery mode to work around Ink TUI issues.'],
       ])}</tbody></table>
 
-      <h2 id="advanced">高级配置</h2>
-      <table><thead><tr><th>变量名</th><th>必需</th><th>说明</th></tr></thead>
+      <h2 id="advanced">Advanced Configuration</h2>
+      <table><thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
       <tbody>{rows([
-        ['ANTHROPIC_API_KEY_HELPER', '可选', '外部脚本路径，动态获取 API Key'],
-        ['ANTHROPIC_AUTH_TOKEN', '可选', 'OAuth Bearer Token（不使用 API Key 时）'],
-        ['CLAUDE_CODE_ENABLE_XAA', '可选', '启用 XAA (SEP-990) IdP 集成'],
-        ['DISABLE_AUTOUPDATER', '可选', '设为 1 禁用自动更新检查'],
-        ['CLAUDE_CODE_SHELL', '可选', '自定义 Shell 路径（默认系统 Shell）'],
-        ['CLAUDE_DISABLE_STREAM_WATCHDOG', '可选', '禁用流空闲看门狗（默认启用）。Mac 休眠唤醒后自动恢复连接'],
-        ['CLAUDE_STREAM_IDLE_TIMEOUT_MS', '可选', '流空闲超时毫秒数（默认 180000，即 3 分钟）'],
-        ['CLAUDE_CODE_USE_POWERSHELL_TOOL', '可选', 'Windows 上优先使用 PowerShell（默认启用）'],
+        ['ANTHROPIC_API_KEY_HELPER', 'Optional', 'Path to an external script that resolves the API key dynamically.'],
+        ['ANTHROPIC_AUTH_TOKEN', 'Optional', 'OAuth bearer token when you are not using an API key.'],
+        ['CLAUDE_CODE_ENABLE_XAA', 'Optional', 'Enable XAA (SEP-990) IdP integration.'],
+        ['DISABLE_AUTOUPDATER', 'Optional', 'Set to 1 to disable automatic update checks.'],
+        ['CLAUDE_CODE_SHELL', 'Optional', 'Custom shell path. Defaults to the system shell.'],
+        ['CLAUDE_DISABLE_STREAM_WATCHDOG', 'Optional', 'Disable the stream idle watchdog. By default it helps recover after Mac sleep and wake cycles.'],
+        ['CLAUDE_STREAM_IDLE_TIMEOUT_MS', 'Optional', 'Stream idle timeout in milliseconds. The default is 180000, which is three minutes.'],
+        ['CLAUDE_CODE_USE_POWERSHELL_TOOL', 'Optional', 'Prefer PowerShell on Windows. Enabled by default.'],
       ])}</tbody></table>
     </>} />
   )

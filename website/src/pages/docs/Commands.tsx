@@ -1,96 +1,96 @@
 import MarkdownDoc, { DocStyles } from '../../components/MarkdownDoc'
 
 const toc = [
-  { id: 'base', text: '基础命令', level: 2 as const },
-  { id: 'config', text: '配置命令', level: 2 as const },
-  { id: 'file', text: '文件命令', level: 2 as const },
-  { id: 'dev', text: '开发命令', level: 2 as const },
-  { id: 'adv', text: '高级命令', level: 2 as const },
-  { id: 'cli-flags', text: 'CLI 启动参数', level: 2 as const },
+  { id: 'base', text: 'Basic Commands', level: 2 as const },
+  { id: 'config', text: 'Configuration Commands', level: 2 as const },
+  { id: 'file', text: 'File Commands', level: 2 as const },
+  { id: 'dev', text: 'Development Commands', level: 2 as const },
+  { id: 'adv', text: 'Advanced Commands', level: 2 as const },
+  { id: 'cli-flags', text: 'CLI Flags', level: 2 as const },
 ]
 
 export default function Commands() {
   return (
-    <MarkdownDoc title="命令大全" description="MiniClaude 所有可用命令及用法" toc={toc} content={<>
+    <MarkdownDoc title="Command Reference" description="All available MiniClaude commands and how to use them." toc={toc} content={<>
       <DocStyles />
-      <h2 id="base">基础命令</h2>
+      <h2 id="base">Basic Commands</h2>
       <table>
-        <thead><tr><th>命令</th><th>说明</th><th>示例</th></tr></thead>
+        <thead><tr><th>Command</th><th>Description</th><th>Example</th></tr></thead>
         <tbody>
-          <tr><td><code>/help</code></td><td>显示帮助信息</td><td><code>/help</code></td></tr>
-          <tr><td><code>/clear</code></td><td>清空当前对话</td><td><code>/clear</code></td></tr>
-          <tr><td><code>/exit</code></td><td>退出程序</td><td><code>/exit</code></td></tr>
-          <tr><td><code>/status</code></td><td>显示当前状态（模型/分支/权限等）</td><td><code>/status</code></td></tr>
-          <tr><td><code>/stats</code></td><td>查看使用统计</td><td><code>/stats</code></td></tr>
-          <tr><td><code>/doctor</code></td><td>系统诊断检查</td><td><code>/doctor</code></td></tr>
+          <tr><td><code>/help</code></td><td>Show the help screen.</td><td><code>/help</code></td></tr>
+          <tr><td><code>/clear</code></td><td>Clear the current conversation.</td><td><code>/clear</code></td></tr>
+          <tr><td><code>/exit</code></td><td>Exit the program.</td><td><code>/exit</code></td></tr>
+          <tr><td><code>/status</code></td><td>Show the current status, including model, branch, and permissions.</td><td><code>/status</code></td></tr>
+          <tr><td><code>/stats</code></td><td>View usage statistics.</td><td><code>/stats</code></td></tr>
+          <tr><td><code>/doctor</code></td><td>Run system diagnostics.</td><td><code>/doctor</code></td></tr>
         </tbody>
       </table>
 
-      <h2 id="config">配置命令</h2>
+      <h2 id="config">Configuration Commands</h2>
       <table>
-        <thead><tr><th>命令</th><th>说明</th><th>示例</th></tr></thead>
+        <thead><tr><th>Command</th><th>Description</th><th>Example</th></tr></thead>
         <tbody>
-          <tr><td><code>/config</code></td><td>打开配置文件</td><td><code>/config</code></td></tr>
-          <tr><td><code>/model</code></td><td>切换 AI 模型</td><td><code>/model deepseek-v4-pro</code></td></tr>
-          <tr><td><code>/theme</code></td><td>切换终端主题</td><td><code>/theme dark</code></td></tr>
-          <tr><td><code>/provider</code></td><td>切换模型提供商（支持热切换）</td><td><code>/provider kiro</code></td></tr>
-          <tr><td><code>/permissions</code></td><td>管理权限规则</td><td><code>/permissions</code></td></tr>
-          <tr><td><code>/hooks</code></td><td>管理生命周期钩子</td><td><code>/hooks</code></td></tr>
-          <tr><td><code>/output-style</code></td><td>设置输出风格</td><td><code>/output-style concise</code></td></tr>
+          <tr><td><code>/config</code></td><td>Open the configuration file.</td><td><code>/config</code></td></tr>
+          <tr><td><code>/model</code></td><td>Switch the active AI model.</td><td><code>/model deepseek-v4-pro</code></td></tr>
+          <tr><td><code>/theme</code></td><td>Switch the terminal theme.</td><td><code>/theme dark</code></td></tr>
+          <tr><td><code>/provider</code></td><td>Switch the model provider with hot swapping.</td><td><code>/provider kiro</code></td></tr>
+          <tr><td><code>/permissions</code></td><td>Manage permission rules.</td><td><code>/permissions</code></td></tr>
+          <tr><td><code>/hooks</code></td><td>Manage lifecycle hooks.</td><td><code>/hooks</code></td></tr>
+          <tr><td><code>/output-style</code></td><td>Set the response style.</td><td><code>/output-style concise</code></td></tr>
         </tbody>
       </table>
 
-      <h2 id="file">文件命令</h2>
+      <h2 id="file">File Commands</h2>
       <table>
-        <thead><tr><th>命令</th><th>说明</th><th>示例</th></tr></thead>
+        <thead><tr><th>Command</th><th>Description</th><th>Example</th></tr></thead>
         <tbody>
-          <tr><td><code>/files</code></td><td>查看上下文中的文件列表</td><td><code>/files</code></td></tr>
-          <tr><td><code>/add-dir</code></td><td>添加目录到工作上下文</td><td><code>/add-dir src/</code></td></tr>
-          <tr><td><code>/diff</code></td><td>查看当前代码变更</td><td><code>/diff</code></td></tr>
-          <tr><td><code>/copy</code></td><td>复制最后一条对话到剪贴板</td><td><code>/copy</code></td></tr>
-          <tr><td><code>/export</code></td><td>导出对话记录</td><td><code>/export</code></td></tr>
+          <tr><td><code>/files</code></td><td>Show the files currently in context.</td><td><code>/files</code></td></tr>
+          <tr><td><code>/add-dir</code></td><td>Add a directory to the working context.</td><td><code>/add-dir src/</code></td></tr>
+          <tr><td><code>/diff</code></td><td>Show the current code changes.</td><td><code>/diff</code></td></tr>
+          <tr><td><code>/copy</code></td><td>Copy the last response to the clipboard.</td><td><code>/copy</code></td></tr>
+          <tr><td><code>/export</code></td><td>Export the conversation history.</td><td><code>/export</code></td></tr>
         </tbody>
       </table>
 
-      <h2 id="dev">开发命令</h2>
+      <h2 id="dev">Development Commands</h2>
       <table>
-        <thead><tr><th>命令</th><th>说明</th><th>示例</th></tr></thead>
+        <thead><tr><th>Command</th><th>Description</th><th>Example</th></tr></thead>
         <tbody>
-          <tr><td><code>/init</code></td><td>初始化项目 CLAUDE.md</td><td><code>/init</code></td></tr>
-          <tr><td><code>/compact</code></td><td>压缩对话上下文</td><td><code>/compact</code></td></tr>
-          <tr><td><code>/review</code></td><td>代码审查当前变更</td><td><code>/review</code></td></tr>
-          <tr><td><code>/pr_comments</code></td><td>查看 PR 评论</td><td><code>/pr_comments</code></td></tr>
-          <tr><td><code>/plan</code></td><td>进入计划模式</td><td><code>/plan</code></td></tr>
-          <tr><td><code>/rename</code></td><td>重命名当前对话</td><td><code>/rename "New Name"</code></td></tr>
+          <tr><td><code>/init</code></td><td>Initialize the project CLAUDE.md file.</td><td><code>/init</code></td></tr>
+          <tr><td><code>/compact</code></td><td>Compact the conversation context.</td><td><code>/compact</code></td></tr>
+          <tr><td><code>/review</code></td><td>Review the current code changes.</td><td><code>/review</code></td></tr>
+          <tr><td><code>/pr_comments</code></td><td>View PR comments.</td><td><code>/pr_comments</code></td></tr>
+          <tr><td><code>/plan</code></td><td>Enter planning mode.</td><td><code>/plan</code></td></tr>
+          <tr><td><code>/rename</code></td><td>Rename the current conversation.</td><td><code>/rename "New Name"</code></td></tr>
         </tbody>
       </table>
 
-      <h2 id="adv">高级命令</h2>
+      <h2 id="adv">Advanced Commands</h2>
       <table>
-        <thead><tr><th>命令</th><th>说明</th><th>示例</th></tr></thead>
+        <thead><tr><th>Command</th><th>Description</th><th>Example</th></tr></thead>
         <tbody>
-          <tr><td><code>/mcp</code></td><td>管理 MCP 服务器</td><td><code>/mcp</code></td></tr>
-          <tr><td><code>/skills</code></td><td>管理技能</td><td><code>/skills</code></td></tr>
-          <tr><td><code>/tasks</code></td><td>查看后台任务</td><td><code>/tasks</code></td></tr>
-          <tr><td><code>/vim</code></td><td>切换 Vim 模式</td><td><code>/vim</code></td></tr>
-          <tr><td><code>/fast</code></td><td>切换快速模式</td><td><code>/fast</code></td></tr>
-          <tr><td><code>/effort</code></td><td>设置推理深度</td><td><code>/effort high</code></td></tr>
-          <tr><td><code>/html-output</code></td><td>生成 HTML 报告</td><td><code>/html-output 分析报告</code></td></tr>
+          <tr><td><code>/mcp</code></td><td>Manage MCP servers.</td><td><code>/mcp</code></td></tr>
+          <tr><td><code>/skills</code></td><td>Manage skills.</td><td><code>/skills</code></td></tr>
+          <tr><td><code>/tasks</code></td><td>View background tasks.</td><td><code>/tasks</code></td></tr>
+          <tr><td><code>/vim</code></td><td>Toggle Vim mode.</td><td><code>/vim</code></td></tr>
+          <tr><td><code>/fast</code></td><td>Toggle fast mode.</td><td><code>/fast</code></td></tr>
+          <tr><td><code>/effort</code></td><td>Set the reasoning depth.</td><td><code>/effort high</code></td></tr>
+          <tr><td><code>/html-output</code></td><td>Generate an HTML report.</td><td><code>/html-output analysis report</code></td></tr>
         </tbody>
       </table>
 
-      <h2 id="cli-flags">CLI 启动参数</h2>
+      <h2 id="cli-flags">CLI Flags</h2>
       <table>
-        <thead><tr><th>参数</th><th>说明</th></tr></thead>
+        <thead><tr><th>Flag</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td><code>-p, --print</code></td><td>非交互模式，直接回答问题后退出</td></tr>
-          <tr><td><code>--model</code></td><td>指定启动时使用的模型</td></tr>
-          <tr><td><code>--permission-mode</code></td><td>设置权限模式：default / acceptEdits / bypassPermissions / plan</td></tr>
-          <tr><td><code>--output-format</code></td><td>输出格式：text / json / stream-json</td></tr>
-          <tr><td><code>--continue</code></td><td>继续最近的对话</td></tr>
-          <tr><td><code>--resume</code></td><td>恢复指定 ID 的会话</td></tr>
-          <tr><td><code>--version</code></td><td>显示版本号</td></tr>
-          <tr><td><code>--dir</code></td><td>设置启动工作目录</td></tr>
+          <tr><td><code>-p, --print</code></td><td>Run in non-interactive mode, answer once, then exit.</td></tr>
+          <tr><td><code>--model</code></td><td>Choose the startup model.</td></tr>
+          <tr><td><code>--permission-mode</code></td><td>Set the permission mode: default / acceptEdits / bypassPermissions / plan.</td></tr>
+          <tr><td><code>--output-format</code></td><td>Select the output format: text / json / stream-json.</td></tr>
+          <tr><td><code>--continue</code></td><td>Continue the most recent conversation.</td></tr>
+          <tr><td><code>--resume</code></td><td>Resume a session by ID.</td></tr>
+          <tr><td><code>--version</code></td><td>Show the version number.</td></tr>
+          <tr><td><code>--dir</code></td><td>Set the startup working directory.</td></tr>
         </tbody>
       </table>
     </>} />

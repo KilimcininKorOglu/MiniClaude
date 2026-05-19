@@ -10,36 +10,36 @@ export interface NavSection {
 
 export const sidebarNav: NavSection[] = [
   {
-    title: '快速开始',
+    title: 'Quick Start',
     items: [
-      { title: '安装与启动', path: '/guide/quick-start' },
-      { title: '环境变量', path: '/guide/env-vars' },
-      { title: '第三方模型', path: '/guide/third-party-models' },
-      { title: '全局使用', path: '/guide/global-usage' },
-      { title: '常见问题', path: '/guide/faq' },
+      { title: 'Install and Run', path: '/guide/quick-start' },
+      { title: 'Environment Variables', path: '/guide/env-vars' },
+      { title: 'Third-Party Models', path: '/guide/third-party-models' },
+      { title: 'Global Usage', path: '/guide/global-usage' },
+      { title: 'FAQ', path: '/guide/faq' },
     ],
   },
   {
-    title: '功能指南',
+    title: 'Features',
     items: [
-      { title: '命令大全', path: '/features/commands' },
-      { title: '工具详解', path: '/features/tools' },
-      { title: 'hard_deny 安全规则', path: '/features/hard-deny' },
-      { title: 'HTML 输出', path: '/features/html-output' },
-      { title: '技能系统', path: '/features/skills' },
-      { title: 'MCP 协议', path: '/features/mcp' },
+      { title: 'Command Reference', path: '/features/commands' },
+      { title: 'Tool Reference', path: '/features/tools' },
+      { title: 'hard_deny Security Rules', path: '/features/hard-deny' },
+      { title: 'HTML Output', path: '/features/html-output' },
+      { title: 'Skills System', path: '/features/skills' },
+      { title: 'MCP Protocol', path: '/features/mcp' },
     ],
   },
   {
-    title: '参考',
+    title: 'Reference',
     items: [
-      { title: '项目结构', path: '/reference/project-structure' },
-      { title: '与原版的差异', path: '/reference/differences' },
+      { title: 'Project Structure', path: '/reference/project-structure' },
+      { title: 'Differences from Upstream', path: '/reference/differences' },
     ],
   },
 ]
 
-// Build-time: flatten all pages into searchable entries
+// Build-time: flatten all pages into searchable entries.
 export interface SearchEntry {
   title: string
   path: string
@@ -49,94 +49,94 @@ export interface SearchEntry {
 
 export const searchIndex: SearchEntry[] = [
   {
-    title: '安装与启动',
+    title: 'Install and Run',
     path: '/guide/quick-start',
-    section: '快速开始',
+    section: 'Quick Start',
     content:
-      '安装Bun macOS Linux Windows Homebrew 安装依赖 bun install 配置 .env.example API Key 启动 ./cli bun 全局使用 PATH 降级模式 CLAUDE_CODE_FORCE_RECOVERY_CLI',
+      'Install Bun on macOS Linux or Windows, run bun install, configure .env.example with your API key, start with ./cli or bun, configure PATH for global usage, and use recovery mode with CLAUDE_CODE_FORCE_RECOVERY_CLI.',
   },
   {
-    title: '环境变量',
+    title: 'Environment Variables',
     path: '/guide/env-vars',
-    section: '快速开始',
+    section: 'Quick Start',
     content:
-      'ANTHROPIC_API_KEY 必需 ANTHROPIC_BASE_URL 自定义端点 ANTHROPIC_MODEL 默认模型 ENABLE_PROMPT_CACHING_1H 提示缓存 1小时TTL 降低费用 DISABLE_PROMPT_CACHING 流空闲看门狗 CLAUDE_DISABLE_STREAM_WATCHDOG PowerShell Windows HTTP_PROXY HTTPS_PROXY DEBUG 代理配置 模型选择',
+      'ANTHROPIC_API_KEY is required, ANTHROPIC_BASE_URL sets a custom endpoint, ANTHROPIC_MODEL chooses the default model, ENABLE_PROMPT_CACHING_1H enables one-hour prompt caching, DISABLE_PROMPT_CACHING disables caching, CLAUDE_DISABLE_STREAM_WATCHDOG controls stream idle watchdog behavior, and HTTP proxy variables configure networking.',
   },
   {
-    title: '第三方模型',
+    title: 'Third-Party Models',
     path: '/guide/third-party-models',
-    section: '快速开始',
+    section: 'Quick Start',
     content:
-      'DeepSeek OpenAI 兼容 API 自定义 BASE_URL 模型切换 deepseek-v4-pro deepseek-r1 claude-opus gpt 多模型支持 环境变量配置',
+      'Use DeepSeek, OpenAI-compatible APIs, OpenRouter, SiliconFlow, or other Anthropic-compatible providers by setting ANTHROPIC_BASE_URL, ANTHROPIC_API_KEY, and ANTHROPIC_MODEL for multi-model support.',
   },
   {
-    title: '全局使用',
+    title: 'Global Usage',
     path: '/guide/global-usage',
-    section: '快速开始',
+    section: 'Quick Start',
     content:
-      'PATH 环境变量 全局命令 任意目录启动 bin 目录 符号链接 终端集成 快速访问',
+      'Add the bin directory to PATH, create a symlink or shell export, start MiniClaude from any directory, and verify the global command with version and help checks.',
   },
   {
-    title: '常见问题',
+    title: 'FAQ',
     path: '/guide/faq',
-    section: '快速开始',
+    section: 'Quick Start',
     content:
-      'FAQ 常见问题 故障排除 启动失败 权限问题 模型响应慢 构建错误 roadblock 配置不生效',
+      'Troubleshooting for startup failures, permission prompts, slow model responses, build errors, settings that do not apply, MCP connection issues, and plugin installation problems.',
   },
   {
-    title: '命令大全',
+    title: 'Command Reference',
     path: '/features/commands',
-    section: '功能指南',
+    section: 'Features',
     content:
-      '/help 帮助 /clear 清空 /exit 退出 /config 配置 /model 切换模型 /provider 切换提供商 热切换 DeepSeek Kiro /theme 主题 /files 文件 /add-dir 添加目录 /mcp MCP /skills 技能 /tasks 任务 /hooks 钩子 /permissions 权限 /vim Vim模式 /compact 压缩 /review 审查 /stats 统计 /status 状态 /fast 快速模式 /effort 努力级别 /copy 复制 /doctor 诊断 /diff 差异 /init 初始化 /pr_comments PR评论 /plan 计划 /export 导出 /rename 重命名',
+      'Slash commands including /help, /clear, /exit, /config, /model, /provider, /theme, /files, /add-dir, /mcp, /skills, /tasks, /hooks, /permissions, /vim, /compact, /review, /stats, /status, /fast, /effort, /copy, /doctor, /diff, /init, /pr_comments, /plan, /export, and /rename.',
   },
   {
-    title: '工具详解',
+    title: 'Tool Reference',
     path: '/features/tools',
-    section: '功能指南',
+    section: 'Features',
     content:
-      'FileRead FileWrite FileEdit Glob Grep Bash PowerShell WebFetch WebSearch AgentTool SkillTool MCPTool TaskCreate TaskStop NotebookEdit AskUserQuestion 读文件 写文件 编辑文件 搜索文件 内容搜索 命令执行 网络请求 子代理',
+      'Built-in tools including FileRead, FileWrite, FileEdit, Glob, Grep, Bash, PowerShell, WebFetch, WebSearch, AgentTool, SkillTool, MCP tools, TaskCreate, TaskStop, NotebookEdit, and AskUserQuestion for file work, search, command execution, networking, and automation.',
   },
   {
-    title: 'hard_deny 安全规则',
+    title: 'hard_deny Security Rules',
     path: '/features/hard-deny',
-    section: '功能指南',
+    section: 'Features',
     content:
-      '无条件禁止 安全拦截 管道级阻断 settings.json autoMode 配置 防误删 敏感文件保护 网络风险阻断 合规策略 自动模式安全网 权限系统对比',
+      'hard_deny blocks matched tool calls unconditionally, enforces safety at the pipeline level, protects sensitive files, prevents destructive shell commands, and works alongside settings.json permissions and auto mode rules.',
   },
   {
-    title: 'HTML 输出',
+    title: 'HTML Output',
     path: '/features/html-output',
-    section: '功能指南',
+    section: 'Features',
     content:
-      'HTML 报告 自包含 暗色模式 响应式布局 /html-output 技能 复杂分析 代码审查报告 架构方案 CSS变量 prefers-color-scheme 浏览器打开 无外部依赖',
+      'Generate self-contained HTML reports with dark mode, responsive layout, system fonts, table styling, and browser-friendly output for code reviews, architecture notes, and analysis summaries.',
   },
   {
-    title: '技能系统',
+    title: 'Skills System',
     path: '/features/skills',
-    section: '功能指南',
+    section: 'Features',
     content:
-      'Skills 技能 自定义技能 SKILL.md registerBundledSkill simplify html-output debug batch stuck verify 可复用工作流 提示模板',
+      'Skills are reusable workflows powered by SKILL.md files, bundled registrations, automatic prompt loading, and slash-command entry points such as simplify, html-output, debug, batch, stuck, and verify.',
   },
   {
-    title: 'MCP 协议',
+    title: 'MCP Protocol',
     path: '/features/mcp',
-    section: '功能指南',
+    section: 'Features',
     content:
-      'MCP Model Context Protocol mcpServers alwaysLoad 工具预加载 免搜索 stdio SSE HTTP WebSocket chrome-devtools jadx-mcp kali-docker 工具扩展 服务器配置',
+      'MCP stands for Model Context Protocol and supports stdio, SSE, HTTP, WebSocket, alwaysLoad preloading, tool discovery, resource access, and external servers like chrome-devtools or jadx-mcp.',
   },
   {
-    title: '项目结构',
+    title: 'Project Structure',
     path: '/reference/project-structure',
-    section: '参考',
+    section: 'Reference',
     content:
-      'src 目录 entrypoints commands tools components services utils skills plugins 源代码结构 架构 模块组织 CLI入口',
+      'Source layout covering CLI entrypoints, commands, tools, components, services, utilities, skills, plugins, scripts, and the website source tree.',
   },
   {
-    title: '与原版的差异',
+    title: 'Differences from Upstream',
     path: '/reference/differences',
-    section: '参考',
+    section: 'Reference',
     content:
-      '精简 删除92000行 云服务移除 OAuth 遥测 设置同步 协作功能 实验功能 速率限制 保留核心功能 硬盘占用 依赖数量 对比表格',
+      'MiniClaude removes cloud services, OAuth, telemetry, settings sync, collaboration features, experiments, and rate limiting while keeping core coding workflows and adding hard_deny plus HTML output.',
   },
 ]

@@ -3,7 +3,7 @@ import type { Command } from '../../commands.js'
 const mcp = {
   type: 'local-jsx',
   name: 'mcp',
-  description: '管理 MCP 服务器',
+  description: 'Manage MCP servers',
   immediate: true,
   argumentHint: '[enable|disable [server-name]]',
   load: () => import('./mcp.js'),

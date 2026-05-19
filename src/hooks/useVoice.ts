@@ -48,7 +48,7 @@ const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
   français: 'fr',
   francais: 'fr',
   japanese: 'ja',
-  日本語: 'ja',
+  [String.fromCodePoint(26085, 26412, 35486)]: 'ja',
   german: 'de',
   deutsch: 'de',
   portuguese: 'pt',

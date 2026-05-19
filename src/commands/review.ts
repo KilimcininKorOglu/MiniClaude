@@ -33,7 +33,7 @@ const LOCAL_REVIEW_PROMPT = (args: string) => `
 const review: Command = {
   type: 'prompt',
   name: 'review',
-  description: '审查拉取请求',
+  description: 'Review a pull request',
   progressMessage: 'reviewing pull request',
   contentLength: 0,
   source: 'builtin',
@@ -48,7 +48,7 @@ const review: Command = {
 const ultrareview: Command = {
   type: 'local-jsx',
   name: 'ultrareview',
-  description: `~10–20 分钟 · 查找并验证你分支中的错误。在 Claude Code 网页版运行。查看 ${CCR_TERMS_URL}`,
+  description: `~10–20 min · Find and verify bugs in your branch. Runs in Claude Code Web. See ${CCR_TERMS_URL}`,
   isEnabled: () => isUltrareviewEnabled(),
   load: () => import('./review/ultrareviewCommand.js'),
 }

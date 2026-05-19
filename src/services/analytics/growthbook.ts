@@ -1,6 +1,6 @@
 /**
- * GrowthBook 集成 - 占位文件
- * 原始功能已删除，保留此文件以保持兼容性
+ * GrowthBook integration - placeholder file
+ * Original functionality removed; keep this file for compatibility
  */
 
 export function getFeatureValue_CACHED_MAY_BE_STALE<T>(
@@ -57,7 +57,7 @@ export async function checkSecurityRestrictionGate(
 }
 
 export function onGrowthBookRefresh(_callback: () => void): () => void {
-  // 返回一个空的清理函数
+  // Return an empty cleanup function
   return () => {}
 }
 

@@ -3,7 +3,7 @@ import type { Command } from '../commands.js';
 import { AGENT_TOOL_NAME } from '../tools/AgentTool/constants.js';
 const statusline = {
   type: 'prompt',
-  description: '设置 Claude Code 的状态栏 UI',
+  description: 'Set Claude Code status line UI',
   contentLength: 0,
   // Dynamic content
   aliases: [],

@@ -3,7 +3,7 @@ import type { Command } from '../../commands.js'
 const agents = {
   type: 'local-jsx',
   name: 'agents',
-  description: '管理代理配置',
+  description: 'Manage agent configuration',
   load: () => import('./agents.js'),
 } satisfies Command
 

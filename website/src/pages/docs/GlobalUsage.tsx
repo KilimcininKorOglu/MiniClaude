@@ -2,41 +2,41 @@ import MarkdownDoc, { DocStyles } from '../../components/MarkdownDoc'
 
 export default function GlobalUsage() {
   return (
-    <MarkdownDoc title="全局使用" description="在任意目录中调用 MiniClaude" content={<>
+    <MarkdownDoc title="Global Usage" description="Run MiniClaude from any directory." content={<>
       <DocStyles />
       <h2 id="unix">macOS / Linux</h2>
-      <p>将 MiniClaude 的 <code>bin/</code> 目录添加到 PATH：</p>
-      <pre><code>{`# 添加到 shell 配置文件 (~/.bashrc, ~/.zshrc 等)
+      <p>Add MiniClaude&apos;s <code>bin/</code> directory to PATH:</p>
+      <pre><code>{`# Add this to your shell config file (~/.bashrc, ~/.zshrc, and so on)
 export PATH="$HOME/MiniClaude/bin:$PATH"
 
-# 使配置生效
+# Reload the shell config
 source ~/.zshrc
 
-# 现在可以在任意目录启动
+# You can now start MiniClaude from any directory
 cd ~/my-project
 claude`}</code></pre>
 
       <h2 id="windows">Windows</h2>
-      <p>方法一：在 Git Bash 中配置：</p>
+      <p>Option 1: configure it in Git Bash:</p>
       <pre><code>{`echo 'export PATH="/e/Product/MiniClaude/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc`}</code></pre>
-      <p>方法二：PowerShell 临时添加：</p>
+      <p>Option 2: add it temporarily in PowerShell:</p>
       <pre><code>{`$env:Path += ";E:\\Product\\MiniClaude\\bin"
 claude`}</code></pre>
-      <p>方法三：系统环境变量（永久生效）：</p>
-      <p>打开"系统属性 → 高级 → 环境变量"，在 Path 中添加 <code>E:\Product\MiniClaude\bin</code>。</p>
+      <p>Option 3: set a permanent system environment variable:</p>
+      <p>Open System Properties → Advanced → Environment Variables, then add <code>E:\Product\MiniClaude\bin</code> to Path.</p>
 
-      <h2 id="verify">验证安装</h2>
-      <pre><code>{`# 查看版本
+      <h2 id="verify">Verify the Installation</h2>
+      <pre><code>{`# Show the version
 claude --version
 
-# 查看帮助
+# Show help
 claude --help
 
-# 启动对话
+# Start chatting
 claude`}</code></pre>
 
-      <blockquote>确保 <code>.env</code> 文件在 MiniClaude 项目根目录下，或者已将环境变量配置为系统级变量。</blockquote>
+      <blockquote>Make sure the <code>.env</code> file lives in the MiniClaude project root, or promote the required variables to system-level environment variables.</blockquote>
     </>} />
   )
 }

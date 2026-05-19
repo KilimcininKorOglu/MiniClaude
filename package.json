@@ -2,7 +2,7 @@
   "name": "miniclaude",
   "version": "1.0.0",
   "private": true,
-  "description": "轻量级本地 AI 编程助手 - 基于 Claude Code 精简改造",
+  "description": "Lightweight local AI coding assistant - streamlined from Claude Code",
   "type": "module",
   "packageManager": "bun@1.3.11",
   "bin": {

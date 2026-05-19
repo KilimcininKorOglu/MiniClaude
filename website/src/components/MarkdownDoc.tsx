@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useLanguage } from '../contexts/LanguageContext'
 import type { ReactNode } from 'react'
 
 export interface TocItem {
@@ -16,8 +15,6 @@ interface MarkdownDocProps {
 }
 
 export default function MarkdownDoc({ title, description, content, toc }: MarkdownDocProps) {
-  const { lang } = useLanguage()
-
   useEffect(() => {
     document.title = `${title} - MiniClaude`
     window.scrollTo(0, 0)
@@ -26,10 +23,10 @@ export default function MarkdownDoc({ title, description, content, toc }: Markdo
   return (
     <div className="flex gap-8">
       {/* Main content */}
-      <article className="flex-1 min-w-0">
-        <h1 className="font-display text-3xl md:text-4xl text-white mb-3">{title}</h1>
+      <article className="min-w-0 flex-1">
+        <h1 className="mb-3 font-display text-3xl text-white md:text-4xl">{title}</h1>
         {description && (
-          <p className="text-white/50 text-sm mb-8">{description}</p>
+          <p className="mb-8 text-sm text-white/50">{description}</p>
         )}
         <div className="prose-custom">
           {content}
@@ -38,17 +35,17 @@ export default function MarkdownDoc({ title, description, content, toc }: Markdo
 
       {/* Right outline */}
       {toc && toc.length > 0 && (
-        <aside className="w-48 shrink-0 hidden xl:block sticky top-20 self-start">
+        <aside className="sticky top-20 hidden w-48 shrink-0 self-start xl:block">
           <nav className="border-l border-white/10 pl-4">
-            <div className="text-xs font-bold text-white/30 uppercase tracking-wider mb-2">
-              {lang === 'zh' ? '本页导航' : 'On this page'}
+            <div className="mb-2 text-xs font-bold uppercase tracking-wider text-white/30">
+              On this page
             </div>
             <ul className="space-y-1">
               {toc.map(item => (
                 <li key={item.id}>
                   <a
                     href={`#${item.id}`}
-                    className={`block text-xs hover:text-accent transition-colors ${
+                    className={`block text-xs transition-colors hover:text-accent ${
                       item.level === 3 ? 'pl-3 text-white/40' : 'text-white/50'
                     }`}
                   >
@@ -64,8 +61,7 @@ export default function MarkdownDoc({ title, description, content, toc }: Markdo
   )
 }
 
-// ─── Shared style component for doc content ────────────────────────────
-
+// Shared style component for doc content.
 export function DocStyles() {
   return (
     <style>{`

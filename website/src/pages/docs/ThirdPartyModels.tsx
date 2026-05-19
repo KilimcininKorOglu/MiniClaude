@@ -2,56 +2,56 @@ import MarkdownDoc, { DocStyles } from '../../components/MarkdownDoc'
 
 const toc = [
   { id: 'deepseek', text: 'DeepSeek', level: 2 as const },
-  { id: 'openai', text: 'OpenAI 兼容 API', level: 2 as const },
-  { id: 'custom', text: '其他兼容 API', level: 2 as const },
-  { id: 'model-switch', text: '切换模型', level: 2 as const },
+  { id: 'openai', text: 'OpenAI-Compatible APIs', level: 2 as const },
+  { id: 'custom', text: 'Other Compatible APIs', level: 2 as const },
+  { id: 'model-switch', text: 'Switch Models', level: 2 as const },
 ]
 
 export default function ThirdPartyModels() {
   return (
-    <MarkdownDoc title="第三方模型" description="接入 DeepSeek、OpenAI 等第三方模型" toc={toc} content={<>
+    <MarkdownDoc title="Third-Party Models" description="Connect DeepSeek, OpenAI-compatible services, and other third-party models." toc={toc} content={<>
       <DocStyles />
-      <p>MiniClaude 支持接入<strong>任意 Anthropic 兼容 API</strong>，无需付费 Anthropic 账号即可使用。</p>
+      <p>MiniClaude can connect to <strong>any Anthropic-compatible API</strong>, so you are not limited to a paid Anthropic account.</p>
 
       <h2 id="deepseek">DeepSeek</h2>
-      <p>在 <code>.env</code> 中配置：</p>
+      <p>Configure these variables in <code>.env</code>:</p>
       <pre><code>{`ANTHROPIC_API_KEY=sk-your-deepseek-api-key
 ANTHROPIC_BASE_URL=https://api.deepseek.com
 ANTHROPIC_MODEL=deepseek-v4-pro`}</code></pre>
-      <p>支持的 DeepSeek 模型：</p>
+      <p>Common DeepSeek models:</p>
       <ul>
-        <li><code>deepseek-v4-pro</code> — 旗舰模型，适合复杂编程任务</li>
-        <li><code>deepseek-r1</code> — 推理模型，适合深度思考</li>
-        <li><code>deepseek-v3</code> — 日常编程和对话</li>
+        <li><code>deepseek-v4-pro</code> — flagship model for demanding coding tasks.</li>
+        <li><code>deepseek-r1</code> — reasoning model for deeper analysis.</li>
+        <li><code>deepseek-v3</code> — general-purpose coding and chat.</li>
       </ul>
 
-      <h2 id="openai">OpenAI 兼容 API</h2>
-      <p>任何兼容 OpenAI Messages API 的服务商都可以接入：</p>
+      <h2 id="openai">OpenAI-Compatible APIs</h2>
+      <p>Any provider that supports an OpenAI-compatible Messages API can be used:</p>
       <pre><code>{`ANTHROPIC_API_KEY=sk-your-openai-key
 ANTHROPIC_BASE_URL=https://api.openai.com
 ANTHROPIC_MODEL=gpt-5-1-codex`}</code></pre>
 
-      <h2 id="custom">其他兼容 API</h2>
-      <p>支持所有提供 Anthropic-compatible API 的服务商，包括但不限于：</p>
+      <h2 id="custom">Other Compatible APIs</h2>
+      <p>MiniClaude also works with services that expose Anthropic-compatible APIs, including but not limited to:</p>
       <ul>
-        <li><strong>Novita AI</strong> — 低价 API 中转</li>
-        <li><strong>SiliconFlow</strong> (硅基流动) — 国产大模型平台</li>
-        <li><strong>OpenRouter</strong> — 多模型路由服务</li>
-        <li><strong>自托管服务</strong> — 如 LiteLLM、One API 等中转项目</li>
+        <li><strong>Novita AI</strong> — lower-cost API gateway.</li>
+        <li><strong>SiliconFlow</strong> — large-model platform with Anthropic-compatible endpoints.</li>
+        <li><strong>OpenRouter</strong> — multi-model routing service.</li>
+        <li><strong>Self-hosted services</strong> — gateways such as LiteLLM or One API.</li>
       </ul>
-      <pre><code>{`# OpenRouter 示例
+      <pre><code>{`# OpenRouter example
 ANTHROPIC_API_KEY=sk-or-v1-xxx
 ANTHROPIC_BASE_URL=https://openrouter.ai/api
 ANTHROPIC_MODEL=anthropic/claude-sonnet-4-6`}</code></pre>
 
-      <h2 id="model-switch">切换模型</h2>
-      <p>启动后可在对话中随时切换模型：</p>
-      <pre><code>{`# 使用 /model 命令
+      <h2 id="model-switch">Switch Models</h2>
+      <p>You can switch models at any time after startup:</p>
+      <pre><code>{`# Use the /model command
 /model deepseek-r1
 
-# 或在设置中修改
+# Or update the setting directly
 # settings.json → "model": "deepseek-v4-pro"`}</code></pre>
-      <blockquote>不同模型的价格和速度差异很大，建议日常使用 DeepSeek V4 Pro，复杂任务使用 Claude Opus 4.6。</blockquote>
+      <blockquote>Model pricing and speed vary widely. DeepSeek V4 Pro works well for everyday use, while Claude Opus 4.6 is a better fit for the heaviest tasks.</blockquote>
     </>} />
   )
 }

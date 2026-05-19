@@ -1,20 +1,20 @@
-# MiniClaude 官网
+# MiniClaude Website
 
-## 本地开发
+## Local Development
 
 ```bash
 bun install
 bun run dev
 ```
 
-## 构建
+## Build
 
 ```bash
 bun run build
 ```
 
-## 部署到 GitHub Pages
+## Deploy to GitHub Pages
 
-1. 推送代码到 GitHub
-2. 在仓库设置中启用 GitHub Pages，选择 "GitHub Actions" 作为部署源
-3. 推送到 main 分支会自动部署
+1. Push code to GitHub.
+2. Enable GitHub Pages in the repository settings and choose "GitHub Actions" as the deployment source.
+3. Pushing to the main branch deploys automatically.

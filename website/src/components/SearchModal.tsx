@@ -54,7 +54,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
       if (e.key === 'Escape') onClose()
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault()
-        // toggle
+        // Toggle the dialog from the global shortcut.
         if (open) onClose()
       }
     }
@@ -78,7 +78,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
             type="text"
             value={query}
             onChange={e => handleSearch(e.target.value)}
-            placeholder="搜索文档... (Esc 关闭)"
+            placeholder="Search docs... (Esc to close)"
             className="w-full px-3 py-4 bg-transparent text-white text-sm font-mono outline-none placeholder:text-white/30"
           />
           <kbd className="hidden sm:inline text-xs text-white/30 font-mono px-2 py-0.5 border border-white/20 rounded ml-2">Ctrl+K</kbd>
@@ -88,12 +88,12 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
         <div className="max-h-80 overflow-y-auto">
           {results.length === 0 && query.trim().length > 0 && (
             <div className="px-4 py-8 text-center text-white/40 text-sm font-mono">
-              没有找到相关结果
+              No results found
             </div>
           )}
           {results.length === 0 && query.trim().length === 0 && (
             <div className="px-4 py-8 text-center text-white/40 text-sm font-mono">
-              输入关键词搜索文档
+              Type to search documentation
             </div>
           )}
           {results.map((r, i) => (

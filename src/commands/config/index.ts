@@ -4,7 +4,7 @@ const config = {
   aliases: ['settings'],
   type: 'local-jsx',
   name: 'config',
-  description: '打开配置面板',
+  description: 'Open the configuration panel',
   load: () => import('./config.js'),
 } satisfies Command
 

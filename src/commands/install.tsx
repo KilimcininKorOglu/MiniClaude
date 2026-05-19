@@ -279,7 +279,7 @@ function Install({
 export const install = {
   type: 'local-jsx' as const,
   name: 'install',
-  description: '安装 Claude Code 原生构建版本',
+  description: 'Install the native Claude Code build',
   argumentHint: '[options]',
   async call(onDone: (result: string, options?: {
     display?: CommandResultDisplay;

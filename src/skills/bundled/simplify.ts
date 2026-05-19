@@ -56,7 +56,7 @@ export function registerSimplifySkill(): void {
   registerBundledSkill({
     name: 'simplify',
     description:
-      '审查已更改的代码,检查重用性、质量和效率,然后修复发现的任何问题。',
+      'Review changed code for reuse, quality, and efficiency, then fix any issues found.',
     userInvocable: true,
     async getPromptForCommand(args) {
       let prompt = SIMPLIFY_PROMPT

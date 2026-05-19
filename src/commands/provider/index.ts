@@ -4,7 +4,7 @@ export default {
   type: 'local-jsx',
   name: 'provider',
   get description() {
-    return '切换模型提供商 (DeepSeek / Kiro 等)'
+    return 'Switch model provider (DeepSeek / Kiro, etc.)'
   },
   argumentHint: '[provider-name] [--session]',
   load: () => import('./provider.js'),

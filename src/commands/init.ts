@@ -231,7 +231,7 @@ const command = {
       (process.env.USER_TYPE === 'ant' ||
         isEnvTruthy(process.env.CLAUDE_CODE_NEW_INIT))
       ? 'Initialize new CLAUDE.md file(s) and optional skills/hooks with codebase documentation'
-      : '使用代码库文档初始化新的CLAUDE.md文件'
+      : 'Initialize a new CLAUDE.md file using codebase documentation'
   },
   contentLength: 0, // Dynamic content
   progressMessage: 'analyzing your codebase',

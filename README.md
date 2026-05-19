@@ -17,8 +17,6 @@
 
 [Website](https://txl16095.github.io/MiniClaude/) · [Guide](https://txl16095.github.io/MiniClaude/#/guide/quick-start) · [Community](https://github.com/txl16095/MiniClaude/discussions)
 
-[中文](README.md) | **English**
-
 </div>
 
 ---

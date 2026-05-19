@@ -7,14 +7,14 @@ export default function Hero() {
   
   return (
     <section className="relative min-h-screen flex items-center justify-center px-6 py-20 overflow-hidden">
-      {/* 背景几何图形 */}
+      {/* Background geometry */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-0 left-0 w-full h-px bg-white" />
         <div className="absolute bottom-0 left-0 w-full h-px bg-white" />
         <div className="absolute top-0 left-0 w-px h-full bg-white" />
         <div className="absolute top-0 right-0 w-px h-full bg-white" />
         
-        {/* 对角线 */}
+        {/* Diagonal lines */}
         <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <line x1="0" y1="0" x2="100%" y2="100%" stroke="white" strokeWidth="1" />
           <line x1="100%" y1="0" x2="0" y2="100%" stroke="white" strokeWidth="1" />
@@ -23,7 +23,7 @@ export default function Hero() {
 
       <div className="relative z-10 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* 左侧：主标题 */}
+          {/* Left side: headline */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -77,7 +77,7 @@ export default function Hero() {
             </div>
           </motion.div>
 
-          {/* 右侧：ASCII 艺术 + 代码 */}
+          {/* Right side: ASCII art + code */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -85,7 +85,7 @@ export default function Hero() {
             className="lg:col-span-5"
           >
             <div className="relative border border-white/20 p-8 bg-black/50">
-              {/* 角落装饰 */}
+              {/* Corner accents */}
               <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-accent" />
               <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-accent" />
               <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-accent" />
@@ -118,7 +118,7 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* 底部统计 */}
+        {/* Bottom stats */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

@@ -5,7 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 export default function Features() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, amount: 0.2 })
-  const { t, language } = useLanguage()
+  const { t } = useLanguage()
 
   const features = [
     {
@@ -37,7 +37,7 @@ export default function Features() {
   return (
     <section id="features" ref={ref} className="relative py-32 px-6 border-t border-white/10">
       <div className="max-w-7xl mx-auto">
-        {/* 标题 */}
+        {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -54,7 +54,7 @@ export default function Features() {
           </h2>
         </motion.div>
 
-        {/* 特性网格 */}
+        {/* Feature grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/10">
           {features.map((feature, index) => (
             <motion.div
@@ -64,7 +64,7 @@ export default function Features() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               className="group relative bg-black p-8 md:p-12 hover:bg-white/5 transition-colors"
             >
-              {/* 角落标记 */}
+              {/* Corner marker */}
               <div className="absolute top-4 right-4 w-2 h-2 bg-accent opacity-0 group-hover:opacity-100 transition-opacity" />
               
               <div className="mb-6">
@@ -88,13 +88,13 @@ export default function Features() {
                 {feature.description}
               </p>
 
-              {/* 底部线条 */}
+              {/* Bottom line */}
               <div className="absolute bottom-0 left-0 w-0 h-px bg-accent group-hover:w-full transition-all duration-500" />
             </motion.div>
           ))}
         </div>
 
-        {/* 技术栈 */}
+        {/* Tech stack */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}

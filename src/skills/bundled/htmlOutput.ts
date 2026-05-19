@@ -97,9 +97,9 @@ export function registerHtmlOutputSkill(): void {
   registerBundledSkill({
     name: 'html-output',
     description:
-      '生成结构化的 HTML 报告，替代大段 Markdown 输出。适用于复杂分析、代码审查、架构方案等需要丰富视觉呈现的场景。',
+      'Generate a structured HTML report instead of large Markdown output. Use it for complex analysis, code review, architecture proposals, and other cases that benefit from rich visual presentation.',
     userInvocable: true,
-    argumentHint: '[主题或内容描述]',
+    argumentHint: '[topic or content description]',
     async getPromptForCommand(args) {
       let prompt = HTML_OUTPUT_PROMPT
       if (args) {

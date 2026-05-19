@@ -4,19 +4,19 @@ dist/
 /cli-dev
 openclaw/
 
-# 构建产物
+# Build artifacts
 *.exe
 cli.exe
 cli-dev.exe
 
-# 环境配置
+# Environment configuration
 .env
 .env.local
 .env.*.local
 .env.deepseek
 .env.minimax
 
-# IDE 配置
+# IDE configuration
 .vscode/
 .idea/
 *.swp
@@ -24,42 +24,42 @@ cli-dev.exe
 *~
 .claude/
 
-# 操作系统文件
+# Operating system files
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# 日志文件
+# Log files
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 bun-debug.log*
 
-# 临时文件
+# Temporary files
 *.tmp
 *.temp
 .cache/
 *.bun-build
 .*.bun-build
 
-# 开发计划文档（内部使用）
+# Development planning documents (internal use)
 docs/
 
-# 本地工作记录
+# Local work records
 deletion-log.md
 
-# Kiro 相关
+# Kiro-related files
 .kiro/
 
-# 测试覆盖率
+# Test coverage
 coverage/
 .nyc_output/
 
-# 调试文件
+# Debug files
 *.tsbuildinfo
 
-# 本地脚本和代理
+# Local scripts and agents
 fastgpt_proxy.py
 start-fastgpt-proxy.bat
 mc-fastgpt.bat

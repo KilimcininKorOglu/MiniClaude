@@ -96,7 +96,7 @@ const call: LocalCommandCall = async (args, context) => {
 const advisor = {
   type: 'local',
   name: 'advisor',
-  description: '配置顾问模型',
+  description: 'Configure the advisor model',
   argumentHint: '[<model>|off]',
   isEnabled: () => canUserConfigureAdvisor(),
   get isHidden() {

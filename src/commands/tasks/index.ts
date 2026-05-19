@@ -4,7 +4,7 @@ const tasks = {
   type: 'local-jsx',
   name: 'tasks',
   aliases: ['bashes'],
-  description: '列出和管理后台任务',
+  description: 'List and manage background tasks',
   load: () => import('./tasks.js'),
 } satisfies Command
 

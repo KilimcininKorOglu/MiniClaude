@@ -446,7 +446,7 @@ export function registerUpdateConfigSkill(): void {
   registerBundledSkill({
     name: 'update-config',
     description:
-      '通过 settings.json 配置 Claude Code 运行环境。自动化行为（如“每次/当…时”）需使用 hooks 实现，由系统执行，不能依赖记忆。也可用于权限、环境变量及配置文件（settings.json / settings.local.json）修改。简单设置（如主题、模型）请使用 Config 工具。',
+      'Configure the Claude Code runtime via settings.json. Automated behaviors (such as “every time/when...”) must be implemented with hooks, which the system executes instead of memory. Also use this for permissions, environment variables, and settings file changes (settings.json / settings.local.json). For simple settings such as theme or model, use the Config tool.',
     allowedTools: ['Read'],
     userInvocable: true,
     async getPromptForCommand(args) {

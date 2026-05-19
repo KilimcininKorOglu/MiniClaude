@@ -1,8 +1,8 @@
 {
-  "// MiniClaude 配置示例": "复制此文件到 ~/.claude/settings.json 并修改",
-  "// ~/.claude 路径": "Linux/macOS: ~/.claude/settings.json | Windows: C:\\Users\\<用户名>\\.claude\\settings.json",
+  "// MiniClaude configuration example": "Copy this file to ~/.claude/settings.json and edit it",
+  "// ~/.claude path": "Linux/macOS: ~/.claude/settings.json | Windows: C:\\Users\\<username>\\.claude\\settings.json",
 
-  "// ━━━━━━━━━━━ 环境变量与模型 ━━━━━━━━━━━": "",
+  "// Environment variables and models": "",
   "env": {
     "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
     "ANTHROPIC_AUTH_TOKEN": "sk-your-api-key-here",
@@ -20,7 +20,7 @@
   },
   "effort": "high",
 
-  "// ━━━━━━━━━━━ 多 Provider 热切换 ━━━━━━━━━━━": "",
+  "// Multi-provider hot switching": "",
   "providers": {
     "deepseek": {
       "env": {
@@ -34,7 +34,7 @@
         "haiku": "deepseek-v4-flash",
         "opus": "deepseek-v4-pro[1m]"
       },
-      "description": "DeepSeek V4 - 便宜，纯文本"
+      "description": "DeepSeek V4 - low cost, text-only"
     },
     "kiro": {
       "env": {
@@ -48,14 +48,14 @@
         "haiku": "claude-sonnet-4-6",
         "opus": "claude-sonnet-4-6"
       },
-      "description": "Claude Sonnet 4.6 - 支持视觉"
+      "description": "Claude Sonnet 4.6 - vision capable"
     }
   },
 
-  "// ━━━━━━━━━━━ 权限 ━━━━━━━━━━━": "",
+  "// Permissions": "",
   "permissions": {
     "defaultMode": "default",
-    "_说明": "'default' 每次询问 | 'acceptEdits' 自动接受编辑 | 'bypassPermissions' 完全跳过确认"
+    "_description": "'default' asks each time | 'acceptEdits' automatically accepts edits | 'bypassPermissions' skips confirmations entirely"
   },
   "skipDangerousModePermissionPrompt": false,
 
@@ -66,7 +66,7 @@
     ]
   },
 
-  "// ━━━━━━━━━━━ MCP 服务器 ━━━━━━━━━━━": "",
+  "// MCP servers": "",
   "mcpServers": {
     "chrome-devtools": {
       "command": "npx",
@@ -74,7 +74,7 @@
     }
   },
 
-  "// ━━━━━━━━━━━ 插件市场 ━━━━━━━━━━━": "",
+  "// Plugin marketplaces": "",
   "enabledPlugins": {
     "superpowers@agents-skills-plugins": true,
     "code-review@claude-plugins-official": true
@@ -94,18 +94,18 @@
     }
   },
 
-  "// ━━━━━━━━━━━ 界面 ━━━━━━━━━━━": "",
-  "language": "zh",
+  "// Interface": "",
+  "language": "en",
   "theme": "dark",
   "fastMode": false,
   "alwaysThinkingEnabled": true,
   "showTurnDuration": true,
   "includeCoAuthoredBy": true,
 
-  "// 更多配置项": {
-    "cleanupPeriodDays": "会话保留天数，0 不保存",
-    "outputStyle": "输出风格",
-    "hooks": "生命周期钩子脚本",
+  "// Additional configuration options": {
+    "cleanupPeriodDays": "Session retention days; 0 disables persistence",
+    "outputStyle": "Output style",
+    "hooks": "Lifecycle hook scripts",
     "theme": "'dark' | 'light' | 'dark-daltonized'"
   }
 }

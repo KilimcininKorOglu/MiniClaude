@@ -58,7 +58,7 @@ export default function Installation() {
           </h2>
         </motion.div>
 
-        {/* 平台选择 */}
+        {/* Platform selector */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -80,14 +80,14 @@ export default function Installation() {
           ))}
         </motion.div>
 
-        {/* 代码块 */}
+        {/* Code block */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.4 }}
           className="relative border border-white/20 bg-black"
         >
-          {/* 顶部栏 */}
+          {/* Top bar */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 border border-white/30" />
@@ -102,19 +102,19 @@ export default function Installation() {
             </button>
           </div>
 
-          {/* 代码内容 */}
+          {/* Code content */}
           <div className="p-6 md:p-8">
             <pre className="font-mono text-sm md:text-base text-accent leading-relaxed overflow-x-auto">
               {commands[platform]}
             </pre>
           </div>
 
-          {/* 角落装饰 */}
+          {/* Corner accents */}
           <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-accent" />
           <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-accent" />
         </motion.div>
 
-        {/* 系统要求 */}
+        {/* System requirements */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}

@@ -1,6 +1,6 @@
 /**
- * Analytics 配置 - 占位文件
- * 原始功能已删除，保留此文件以保持兼容性
+ * Analytics config - placeholder file
+ * Original functionality removed; keep this file for compatibility
  */
 
 export function isAnalyticsDisabled(): boolean {

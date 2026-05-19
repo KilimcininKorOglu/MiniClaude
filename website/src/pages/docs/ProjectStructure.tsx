@@ -2,29 +2,29 @@ import MarkdownDoc, { DocStyles } from '../../components/MarkdownDoc'
 
 export default function ProjectStructure() {
   return (
-    <MarkdownDoc title="项目结构" description="MiniClaude 源码目录结构和架构说明" content={<>
+    <MarkdownDoc title="Project Structure" description="MiniClaude source layout and architecture notes." content={<>
       <DocStyles />
       <pre><code>{`MiniClaude/
 ├── src/
-│   ├── cli/              # CLI 入口和参数解析
-│   ├── commands/          # 斜杠命令实现
-│   ├── components/        # Ink 终端 UI 组件
-│   ├── hooks/             # React Hooks
-│   ├── services/          # 核心服务层
-│   │   ├── api/           # AI API 客户端
-│   │   ├── mcp/           # MCP 协议实现
-│   │   └── lsp/           # LSP 语言服务
-│   ├── tools/             # Agent 工具实现
-│   ├── utils/             # 工具函数库
-│   │   ├── settings/      # 配置系统
-│   │   └── permissions/   # 权限系统
-│   ├── skills/            # 技能系统
-│   │   └── bundled/       # 内置技能
-│   └── plugins/           # 插件系统
+│   ├── cli/              # CLI entrypoint and argument parsing
+│   ├── commands/         # Slash command implementations
+│   ├── components/       # Ink terminal UI components
+│   ├── hooks/            # React hooks
+│   ├── services/         # Core service layer
+│   │   ├── api/          # AI API clients
+│   │   ├── mcp/          # MCP protocol implementation
+│   │   └── lsp/          # LSP language services
+│   ├── tools/            # Agent tool implementations
+│   ├── utils/            # Shared utility functions
+│   │   ├── settings/     # Configuration system
+│   │   └── permissions/  # Permission system
+│   ├── skills/           # Skills system
+│   │   └── bundled/      # Bundled skills
+│   └── plugins/          # Plugin system
 ├── scripts/
-│   └── build.ts           # 构建脚本
-├── website/               # 官网源码
-├── .env.example           # 环境变量模板
+│   └── build.ts          # Build script
+├── website/              # Website source code
+├── .env.example          # Environment template
 └── README.md`}</code></pre>
     </>} />
   )

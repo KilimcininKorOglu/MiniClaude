@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="relative py-16 px-6 border-t border-white/10">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-          {/* 品牌 */}
+          {/* Brand */}
           <div>
             <div className="font-display text-3xl mb-4">
               MINI<span className="text-accent">CLAUDE</span>
@@ -17,7 +17,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* 链接 */}
+          {/* Links */}
           <div>
             <div className="font-mono text-xs text-white/50 mb-4 tracking-wider">{t('footer.links')}</div>
             <ul className="space-y-2">
@@ -41,7 +41,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* 相关 */}
+          {/* Related */}
           <div>
             <div className="font-mono text-xs text-white/50 mb-4 tracking-wider">{t('footer.based')}</div>
             <ul className="space-y-2">
@@ -66,7 +66,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* 底部 */}
+        {/* Bottom */}
         <div className="pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="font-mono text-xs text-white/50">
@@ -93,7 +93,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* 免责声明 */}
+        {/* Disclaimer */}
         <div className="mt-8 p-6 border border-white/10 bg-white/5">
           <p className="font-mono text-xs text-white/50 text-center leading-relaxed whitespace-pre-line">
             {t('footer.disclaimer')}

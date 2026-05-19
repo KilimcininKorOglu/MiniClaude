@@ -3,7 +3,7 @@ import type { Command } from '../../commands.js'
 const theme = {
   type: 'local-jsx',
   name: 'theme',
-  description: '更改主题',
+  description: 'Change the theme',
   load: () => import('./theme.js'),
 } satisfies Command
 
