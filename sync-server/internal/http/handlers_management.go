@@ -187,6 +187,40 @@ func (s *Server) settingsSaveForm(w http.ResponseWriter, r *http.Request) {
 	s.render(w, r, http.StatusOK, "settings.html", data)
 }
 
+func (s *Server) clientRenameForm(w http.ResponseWriter, r *http.Request) {
+	principal, ok := s.requireHTMLAuth(w, r)
+	if !ok {
+		return
+	}
+	if !s.requireCSRF(w, r) {
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		s.renderClientsError(w, r, principal, fmt.Errorf("invalid form submission"))
+		return
+	}
+	clientID := r.FormValue("client_id")
+	name := strings.TrimSpace(r.FormValue("name"))
+	if name == "" {
+		s.renderClientsError(w, r, principal, fmt.Errorf("client name is required"))
+		return
+	}
+	commandTag, err := s.pool.Exec(r.Context(), `
+		update clients set name = $3
+		where workspace_id = $1 and id = $2 and revoked_at is null
+	`, principal.WorkspaceID, clientID, name)
+	if err != nil {
+		s.renderClientsError(w, r, principal, fmt.Errorf("rename client: %w", err))
+		return
+	}
+	if commandTag.RowsAffected() == 0 {
+		s.renderClientsError(w, r, principal, fmt.Errorf("client is not active"))
+		return
+	}
+	_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "client_renamed", map[string]string{"client_id": clientID, "name": name})
+	http.Redirect(w, r, "/clients", http.StatusSeeOther)
+}
+
 func (s *Server) clientRevokeForm(w http.ResponseWriter, r *http.Request) {
 	principal, ok := s.requireHTMLAuth(w, r)
 	if !ok {

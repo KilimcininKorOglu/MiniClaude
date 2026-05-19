@@ -283,6 +283,20 @@ th {
   gap: 1rem;
 }
 
+.actions-column {
+  display: grid;
+  gap: .75rem;
+}
+
+.inline-form {
+  display: flex;
+  gap: .5rem;
+}
+
+.inline-form input {
+  min-width: 12rem;
+}
+
 .badge {
   display: inline-block;
   border-radius: 999px;

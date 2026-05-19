@@ -42,11 +42,19 @@
               {{if .Revoked}}<p class="badge danger">Revoked</p>{{else}}<p class="badge">Active</p>{{end}}
             </div>
             {{if not .Revoked}}
-              <form method="post" action="/ui/clients/revoke" hx-boost="true">
-                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
-                <input type="hidden" name="client_id" value="{{.ID}}">
-                <button class="danger-button" type="submit">Revoke client</button>
-              </form>
+              <div class="actions-column">
+                <form method="post" action="/ui/clients/rename" class="inline-form" hx-boost="true">
+                  <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                  <input type="hidden" name="client_id" value="{{.ID}}">
+                  <input name="name" value="{{.Name}}" required aria-label="Client name">
+                  <button type="submit">Rename</button>
+                </form>
+                <form method="post" action="/ui/clients/revoke" hx-boost="true">
+                  <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                  <input type="hidden" name="client_id" value="{{.ID}}">
+                  <button class="danger-button" type="submit">Revoke client</button>
+                </form>
+              </div>
             {{end}}
           </div>
 

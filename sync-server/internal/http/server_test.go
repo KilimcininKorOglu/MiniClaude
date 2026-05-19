@@ -63,6 +63,22 @@ func TestDashboardRedirectsWithoutSession(t *testing.T) {
 	}
 }
 
+func TestClientRenameRedirectsWithoutSession(t *testing.T) {
+	handler := New(nil, nil, nil, nil, nil, nil, auth.CookieConfig{})
+	request := httptest.NewRequest(http.MethodPost, "/ui/clients/rename", strings.NewReader("client_id=client-1&name=Desk"))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusSeeOther {
+		t.Fatalf("expected 303, got %d", response.Code)
+	}
+	if response.Header().Get("Location") != "/login" {
+		t.Fatalf("expected redirect to /login, got %q", response.Header().Get("Location"))
+	}
+}
+
 func TestSecureHeadersAreApplied(t *testing.T) {
 	handler := New(nil, nil, nil, nil, nil, nil, auth.CookieConfig{})
 	request := httptest.NewRequest(http.MethodGet, "/login", nil)

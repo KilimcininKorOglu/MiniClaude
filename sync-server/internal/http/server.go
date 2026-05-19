@@ -46,6 +46,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /clients", s.clientsPage)
 	s.mux.HandleFunc("GET /sessions", s.sessionsPage)
 	s.mux.HandleFunc("GET /audit", s.auditPage)
+	s.mux.HandleFunc("POST /ui/clients/rename", s.clientRenameForm)
 	s.mux.HandleFunc("POST /ui/clients/revoke", s.clientRevokeForm)
 	s.mux.HandleFunc("POST /ui/client-sessions/terminate", s.clientSessionTerminateForm)
 	s.mux.HandleFunc("GET /device", s.devicePage)
