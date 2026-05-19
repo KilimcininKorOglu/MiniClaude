@@ -53,17 +53,31 @@ type auditEventView struct {
 	Metadata  string
 }
 
+type workspaceSessionView struct {
+	ID           string
+	ClientID     string
+	ClientName   string
+	ProcessID    string
+	Status       string
+	ConnectedAt  string
+	LastSeenAt   string
+	TerminatedAt string
+}
+
 func (s *Server) providerSaveForm(w http.ResponseWriter, r *http.Request) {
 	principal, ok := s.requireHTMLAuth(w, r)
 	if !ok {
 		return
 	}
 	if s.providerStore == nil {
-		s.render(w, http.StatusServiceUnavailable, "providers.html", pageData{Title: "Providers", Principal: principal, Error: "Provider store is not available."})
+		s.render(w, r, http.StatusServiceUnavailable, "providers.html", pageData{Title: "Providers", Principal: principal, Error: "Provider store is not available."})
+		return
+	}
+	if !s.requireCSRF(w, r) {
 		return
 	}
 	if err := r.ParseForm(); err != nil {
-		s.render(w, http.StatusBadRequest, "providers.html", pageData{Title: "Providers", Principal: principal, Error: "Invalid form submission."})
+		s.render(w, r, http.StatusBadRequest, "providers.html", pageData{Title: "Providers", Principal: principal, Error: "Invalid form submission."})
 		return
 	}
 
@@ -94,7 +108,10 @@ func (s *Server) providerDeleteForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if s.providerStore == nil {
-		s.render(w, http.StatusServiceUnavailable, "providers.html", pageData{Title: "Providers", Principal: principal, Error: "Provider store is not available."})
+		s.render(w, r, http.StatusServiceUnavailable, "providers.html", pageData{Title: "Providers", Principal: principal, Error: "Provider store is not available."})
+		return
+	}
+	if !s.requireCSRF(w, r) {
 		return
 	}
 	if err := r.ParseForm(); err != nil {
@@ -119,10 +136,10 @@ func (s *Server) settingsPage(w http.ResponseWriter, r *http.Request) {
 	}
 	data, err := s.settingsPageData(r.Context(), principal, "", "")
 	if err != nil {
-		s.render(w, http.StatusBadRequest, "settings.html", pageData{Title: "Settings", Principal: principal, Error: err.Error()})
+		s.render(w, r, http.StatusBadRequest, "settings.html", pageData{Title: "Settings", Principal: principal, Error: err.Error()})
 		return
 	}
-	s.render(w, http.StatusOK, "settings.html", data)
+	s.render(w, r, http.StatusOK, "settings.html", data)
 }
 
 func (s *Server) settingsSaveForm(w http.ResponseWriter, r *http.Request) {
@@ -130,46 +147,52 @@ func (s *Server) settingsSaveForm(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
+	if !s.requireCSRF(w, r) {
+		return
+	}
 	if err := r.ParseForm(); err != nil {
-		s.render(w, http.StatusBadRequest, "settings.html", pageData{Title: "Settings", Principal: principal, Error: "Invalid form submission."})
+		s.render(w, r, http.StatusBadRequest, "settings.html", pageData{Title: "Settings", Principal: principal, Error: "Invalid form submission."})
 		return
 	}
 	document := json.RawMessage(strings.TrimSpace(r.FormValue("document")))
 	if !json.Valid(document) {
 		data, _ := s.settingsPageData(r.Context(), principal, "Settings document must be valid JSON.", "")
 		data.SettingsDocument = string(document)
-		s.render(w, http.StatusBadRequest, "settings.html", data)
+		s.render(w, r, http.StatusBadRequest, "settings.html", data)
 		return
 	}
 	var baseVersion int64
 	if _, err := fmt.Sscanf(r.FormValue("base_version"), "%d", &baseVersion); err != nil {
-		s.render(w, http.StatusBadRequest, "settings.html", pageData{Title: "Settings", Principal: principal, Error: "Settings version is invalid."})
+		s.render(w, r, http.StatusBadRequest, "settings.html", pageData{Title: "Settings", Principal: principal, Error: "Settings version is invalid."})
 		return
 	}
 	result, err := s.syncService.Push(r.Context(), principal.WorkspaceID, principal.UserID, settingssync.PushRequest{BaseVersion: baseVersion, Document: document})
 	if err != nil {
 		data, _ := s.settingsPageData(r.Context(), principal, err.Error(), "")
-		s.render(w, http.StatusBadRequest, "settings.html", data)
+		s.render(w, r, http.StatusBadRequest, "settings.html", data)
 		return
 	}
 	if !result.Accepted {
 		data, _ := s.settingsPageData(r.Context(), principal, "Settings changed elsewhere. Review the latest version and save again.", "")
-		s.render(w, http.StatusConflict, "settings.html", data)
+		s.render(w, r, http.StatusConflict, "settings.html", data)
 		return
 	}
 	_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "settings_saved", map[string]any{"version": result.Snapshot.Version})
 	s.broadcastSnapshot(r.Context(), principal.WorkspaceID)
 	data, err := s.settingsPageData(r.Context(), principal, "", "Settings saved.")
 	if err != nil {
-		s.render(w, http.StatusBadRequest, "settings.html", pageData{Title: "Settings", Principal: principal, Error: err.Error()})
+		s.render(w, r, http.StatusBadRequest, "settings.html", pageData{Title: "Settings", Principal: principal, Error: err.Error()})
 		return
 	}
-	s.render(w, http.StatusOK, "settings.html", data)
+	s.render(w, r, http.StatusOK, "settings.html", data)
 }
 
 func (s *Server) clientRevokeForm(w http.ResponseWriter, r *http.Request) {
 	principal, ok := s.requireHTMLAuth(w, r)
 	if !ok {
+		return
+	}
+	if !s.requireCSRF(w, r) {
 		return
 	}
 	if err := r.ParseForm(); err != nil {
@@ -191,7 +214,7 @@ func (s *Server) clientRevokeForm(w http.ResponseWriter, r *http.Request) {
 	`, principal.WorkspaceID, clientID)
 	_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "client_revoked", map[string]string{"client_id": clientID})
 	if s.hub != nil {
-		s.hub.Broadcast(principal.WorkspaceID, syncws.Message{Type: "terminate_session", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"client_id": clientID}})
+		s.hub.SendClient(principal.WorkspaceID, clientID, syncws.Message{Type: "terminate_session", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"client_id": clientID}})
 	}
 	http.Redirect(w, r, "/clients", http.StatusSeeOther)
 }
@@ -199,6 +222,9 @@ func (s *Server) clientRevokeForm(w http.ResponseWriter, r *http.Request) {
 func (s *Server) clientSessionTerminateForm(w http.ResponseWriter, r *http.Request) {
 	principal, ok := s.requireHTMLAuth(w, r)
 	if !ok {
+		return
+	}
+	if !s.requireCSRF(w, r) {
 		return
 	}
 	if err := r.ParseForm(); err != nil {
@@ -218,7 +244,10 @@ func (s *Server) clientSessionTerminateForm(w http.ResponseWriter, r *http.Reque
 	}
 	_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "client_session_terminated", map[string]string{"client_id": clientID, "session_id": sessionID})
 	if s.hub != nil {
-		s.hub.Broadcast(principal.WorkspaceID, syncws.Message{Type: "terminate_session", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"client_id": clientID, "session_id": sessionID}})
+		message := syncws.Message{Type: "terminate_session", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"client_id": clientID, "session_id": sessionID}}
+		if !s.hub.SendSession(principal.WorkspaceID, sessionID, message) {
+			s.hub.SendClient(principal.WorkspaceID, clientID, message)
+		}
 	}
 	http.Redirect(w, r, "/clients", http.StatusSeeOther)
 }
@@ -294,6 +323,33 @@ func (s *Server) sessionViews(ctx context.Context, workspaceID, clientID string)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("iterate client sessions: %w", err)
+	}
+	return sessions, nil
+}
+
+func (s *Server) workspaceSessionViews(ctx context.Context, workspaceID string) ([]workspaceSessionView, error) {
+	rows, err := s.pool.Query(ctx, `
+		select cs.id::text, c.id::text, c.name, coalesce(cs.process_id, ''), cs.status, to_char(cs.connected_at, 'YYYY-MM-DD HH24:MI'), to_char(cs.last_seen_at, 'YYYY-MM-DD HH24:MI'), coalesce(to_char(cs.terminated_at, 'YYYY-MM-DD HH24:MI'), '')
+		from client_sessions cs
+		join clients c on c.id = cs.client_id
+		where cs.workspace_id = $1
+		order by cs.connected_at desc
+	`, workspaceID)
+	if err != nil {
+		return nil, fmt.Errorf("list workspace sessions: %w", err)
+	}
+	defer rows.Close()
+
+	sessions := []workspaceSessionView{}
+	for rows.Next() {
+		session := workspaceSessionView{}
+		if err := rows.Scan(&session.ID, &session.ClientID, &session.ClientName, &session.ProcessID, &session.Status, &session.ConnectedAt, &session.LastSeenAt, &session.TerminatedAt); err != nil {
+			return nil, fmt.Errorf("scan workspace session: %w", err)
+		}
+		sessions = append(sessions, session)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate workspace sessions: %w", err)
 	}
 	return sessions, nil
 }
@@ -376,14 +432,25 @@ func (s *Server) bumpSettingsVersion(ctx context.Context, workspaceID, userID, e
 }
 
 func (s *Server) audit(ctx context.Context, workspaceID, userID, actorType, eventType string, metadata any) error {
+	if s.pool == nil {
+		return nil
+	}
 	payload, err := json.Marshal(metadata)
 	if err != nil {
 		return err
 	}
+	var workspaceValue any
+	if workspaceID != "" {
+		workspaceValue = workspaceID
+	}
+	var userValue any
+	if userID != "" {
+		userValue = userID
+	}
 	_, err = s.pool.Exec(ctx, `
 		insert into audit_events (workspace_id, user_id, actor_type, event_type, metadata)
 		values ($1, $2, $3, $4, $5)
-	`, workspaceID, userID, actorType, eventType, payload)
+	`, workspaceValue, userValue, actorType, eventType, payload)
 	return err
 }
 
@@ -400,10 +467,10 @@ func (s *Server) broadcastSnapshot(ctx context.Context, workspaceID string) {
 
 func (s *Server) renderProvidersError(w http.ResponseWriter, r *http.Request, principal auth.Principal, err error) {
 	providers, _ := s.providerViews(r.Context(), principal.WorkspaceID)
-	s.render(w, http.StatusBadRequest, "providers.html", pageData{Title: "Providers", Principal: principal, Providers: providers, Error: err.Error()})
+	s.render(w, r, http.StatusBadRequest, "providers.html", pageData{Title: "Providers", Principal: principal, Providers: providers, Error: err.Error()})
 }
 
 func (s *Server) renderClientsError(w http.ResponseWriter, r *http.Request, principal auth.Principal, err error) {
 	clients, _ := s.clientViews(r.Context(), principal.WorkspaceID)
-	s.render(w, http.StatusBadRequest, "clients.html", pageData{Title: "Clients", Principal: principal, Clients: clients, Error: err.Error()})
+	s.render(w, r, http.StatusBadRequest, "clients.html", pageData{Title: "Clients", Principal: principal, Clients: clients, Error: err.Error()})
 }

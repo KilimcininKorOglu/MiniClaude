@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · MiniClaude Sync</title>
+  <link rel="stylesheet" href="/web/static/app.css">
+  <link rel="icon" href="data:,">
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/dashboard">MiniClaude Sync</a>
+    <nav>
+      <a href="/providers">Providers</a>
+      <a href="/settings">Settings</a>
+      <a href="/clients">Clients</a>
+      <a aria-current="page" href="/sessions">Sessions</a>
+      <a href="/audit">Audit</a>
+      <form method="post" action="/ui/logout" hx-boost="true"><input type="hidden" name="csrf_token" value="{{.CSRFToken}}"><button class="link-button" type="submit">Log out</button></form>
+    </nav>
+  </header>
+  <main class="shell">
+    <section class="hero-panel">
+      <p class="eyebrow">Sessions</p>
+      <h1>Workspace sessions</h1>
+      <p class="muted">Review all MiniClaude sessions in this workspace and terminate active sessions.</p>
+    </section>
+
+    {{if .Error}}<section class="alert">{{.Error}}</section>{{end}}
+
+    <section class="panel">
+      {{if .Sessions}}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Session</th>
+                <th>Client</th>
+                <th>Status</th>
+                <th>Process</th>
+                <th>Connected</th>
+                <th>Last seen</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range .Sessions}}
+                <tr>
+                  <td><code>{{.ID}}</code></td>
+                  <td>{{.ClientName}}<br><span class="muted"><code>{{.ClientID}}</code></span></td>
+                  <td>{{.Status}}</td>
+                  <td>{{.ProcessID}}</td>
+                  <td>{{.ConnectedAt}}</td>
+                  <td>{{.LastSeenAt}}</td>
+                  <td>
+                    {{if eq .Status "active"}}
+                      <form method="post" action="/ui/client-sessions/terminate" hx-boost="true">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <input type="hidden" name="session_id" value="{{.ID}}">
+                        <button class="danger-button" type="submit">Terminate</button>
+                      </form>
+                    {{else}}
+                      {{.TerminatedAt}}
+                    {{end}}
+                  </td>
+                </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+      {{else}}
+        <p class="muted">No sessions recorded yet.</p>
+      {{end}}
+    </section>
+  </main>
+</body>
+</html>

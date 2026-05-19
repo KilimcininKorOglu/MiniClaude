@@ -3,9 +3,12 @@ import { writeFileSyncAndFlush_DEPRECATED } from '../../utils/file.js'
 import { getFsImplementation } from '../../utils/fsOperations.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import { markInternalWrite } from '../../utils/settings/internalWrites.js'
-import { getSettingsFilePathForSource } from '../../utils/settings/settings.js'
+import {
+  getSettingsFilePathForSource,
+  getSettingsForSource,
+} from '../../utils/settings/settings.js'
 import { resetSettingsCache } from '../../utils/settings/settingsCache.js'
-import { updateSyncCredentials } from './credentials.js'
+import { loadSyncCredentials, updateSyncCredentials } from './credentials.js'
 import type { SettingsSnapshot } from './types.js'
 
 export function applySettingsSnapshot(snapshot: SettingsSnapshot): Error | null {
@@ -27,6 +30,16 @@ export function applySettingsSnapshot(snapshot: SettingsSnapshot): Error | null 
     return null
   } catch (error) {
     return error instanceof Error ? error : new Error(String(error))
+  }
+}
+
+export function localSettingsPushMessage(): Record<string, unknown> | null {
+  const credentials = loadSyncCredentials()
+  if (!credentials) return null
+  return {
+    type: 'settings_push',
+    base_version: credentials.settingsVersion ?? 0,
+    document: getSettingsForSource('userSettings') ?? {},
   }
 }
 

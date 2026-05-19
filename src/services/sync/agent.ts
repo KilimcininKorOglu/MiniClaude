@@ -1,7 +1,11 @@
 import { logError } from '../../utils/log.js'
 import { syncWebSocketURL } from './api.js'
 import { loadSyncCredentials, updateSyncCredentials } from './credentials.js'
-import { applySettingsSnapshot, snapshotFromPayload } from './settingsBridge.js'
+import {
+  applySettingsSnapshot,
+  localSettingsPushMessage,
+  snapshotFromPayload,
+} from './settingsBridge.js'
 import type { SyncMessage } from './types.js'
 
 let started = false
@@ -20,6 +24,16 @@ export function startSyncAgent(): void {
     )
     activeSocket = socket
 
+    socket.addEventListener('open', () => {
+      socket.send(JSON.stringify({
+        type: 'hello',
+        client_id: credentials.clientID,
+        workspace_id: credentials.workspaceID,
+        session_id: credentials.sessionID,
+        last_seen_version: credentials.settingsVersion ?? 0,
+      }))
+    })
+
     socket.addEventListener('message', event => {
       try {
         const message = JSON.parse(String(event.data)) as SyncMessage
@@ -31,7 +45,15 @@ export function startSyncAgent(): void {
           terminateIfTargeted(message.payload)
           return
         }
-        if (message.type !== 'snapshot' && message.type !== 'settings_updated') {
+        if (message.type === 'hello_ack' || message.type === 'pong') {
+          return
+        }
+        if (
+          message.type !== 'snapshot' &&
+          message.type !== 'settings_updated' &&
+          message.type !== 'settings_applied' &&
+          message.type !== 'version_reject'
+        ) {
           return
         }
         const snapshot = snapshotFromPayload(message.payload)
@@ -48,6 +70,18 @@ export function startSyncAgent(): void {
     })
   } catch (error) {
     logError(error)
+  }
+}
+
+export function pushLocalSettingsNow(): Error | null {
+  if (!activeSocket || activeSocket.readyState !== WebSocket.OPEN) return null
+  const message = localSettingsPushMessage()
+  if (!message) return null
+  try {
+    activeSocket.send(JSON.stringify(message))
+    return null
+  } catch (error) {
+    return error instanceof Error ? error : new Error(String(error))
   }
 }
 

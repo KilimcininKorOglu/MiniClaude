@@ -113,12 +113,19 @@ func (s *Store) Poll(ctx context.Context, deviceCode string) (PollResult, error)
 		return PollResult{}, fmt.Errorf("device code is required")
 	}
 
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return PollResult{}, fmt.Errorf("begin device poll transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
 	result := PollResult{}
 	var expiresAt time.Time
-	err := s.pool.QueryRow(ctx, `
+	err = tx.QueryRow(ctx, `
 		select status, coalesce(client_id::text, ''), coalesce(workspace_id::text, ''), expires_at
 		from device_login_requests
 		where device_code = $1
+		for update
 	`, deviceCode).Scan(&result.Status, &result.ClientID, &result.WorkspaceID, &expiresAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -127,8 +134,18 @@ func (s *Store) Poll(ctx context.Context, deviceCode string) (PollResult, error)
 		return PollResult{}, fmt.Errorf("poll device request: %w", err)
 	}
 	if result.Status == "pending" && time.Now().UTC().After(expiresAt) {
-		_, _ = s.pool.Exec(ctx, `update device_login_requests set status = 'expired' where device_code = $1`, deviceCode)
+		if _, err := tx.Exec(ctx, `update device_login_requests set status = 'expired' where device_code = $1`, deviceCode); err != nil {
+			return PollResult{}, fmt.Errorf("expire device request: %w", err)
+		}
 		result.Status = "expired"
+	}
+	if result.Status == "approved" {
+		if _, err := tx.Exec(ctx, `update device_login_requests set status = 'consumed' where device_code = $1`, deviceCode); err != nil {
+			return PollResult{}, fmt.Errorf("consume device request: %w", err)
+		}
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return PollResult{}, fmt.Errorf("commit device poll transaction: %w", err)
 	}
 	return result, nil
 }

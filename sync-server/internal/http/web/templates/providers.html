@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{.Title}} · MiniClaude Sync</title>
   <link rel="stylesheet" href="/web/static/app.css">
-  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+  <link rel="icon" href="data:,">
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
 <body>
   <header class="topbar">
@@ -14,7 +16,9 @@
       <a aria-current="page" href="/providers">Providers</a>
       <a href="/settings">Settings</a>
       <a href="/clients">Clients</a>
-      <form method="post" action="/ui/logout" hx-boost="true"><button class="link-button" type="submit">Log out</button></form>
+      <a href="/sessions">Sessions</a>
+      <a href="/audit">Audit</a>
+      <form method="post" action="/ui/logout" hx-boost="true"><input type="hidden" name="csrf_token" value="{{.CSRFToken}}"><button class="link-button" type="submit">Log out</button></form>
     </nav>
   </header>
   <main class="shell">
@@ -29,6 +33,7 @@
     <section class="panel">
       <h2>Add or update provider</h2>
       <form method="post" action="/ui/providers" class="stack" hx-boost="true">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <div class="form-grid">
           <label>Provider name<input name="name" placeholder="deepseek" required></label>
           <label>Base URL<input name="base_url" placeholder="https://api.example.com/anthropic"></label>
@@ -70,6 +75,7 @@
                     <details>
                       <summary>Edit</summary>
                       <form method="post" action="/ui/providers" class="stack compact" hx-boost="true">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                         <input name="name" value="{{.Name}}" required>
                         <input name="base_url" value="{{.BaseURL}}" placeholder="Base URL">
                         <input name="model" value="{{.Model}}" placeholder="Model">
@@ -82,6 +88,7 @@
                       </form>
                     </details>
                     <form method="post" action="/ui/providers/delete" hx-boost="true">
+                      <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                       <input type="hidden" name="provider_id" value="{{.ID}}">
                       <button class="danger-button" type="submit">Delete</button>
                     </form>

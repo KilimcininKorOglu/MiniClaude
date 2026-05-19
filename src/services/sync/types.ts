@@ -32,7 +32,17 @@ export type SyncCredentials = {
 }
 
 export type SyncMessage = {
-  type: string
+  type:
+    | 'session_started'
+    | 'hello_ack'
+    | 'snapshot'
+    | 'settings_updated'
+    | 'settings_applied'
+    | 'version_reject'
+    | 'terminate_session'
+    | 'pong'
+    | 'error'
+    | string
   workspace_id?: string
   version?: number
   payload?: unknown

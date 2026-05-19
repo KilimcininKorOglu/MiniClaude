@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{.Title}} · MiniClaude Sync</title>
   <link rel="stylesheet" href="/web/static/app.css">
-  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+  <link rel="icon" href="data:,">
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
 <body>
   <header class="topbar">
@@ -14,7 +16,9 @@
       <a href="/providers">Providers</a>
       <a href="/settings">Settings</a>
       <a aria-current="page" href="/clients">Clients</a>
-      <form method="post" action="/ui/logout" hx-boost="true"><button class="link-button" type="submit">Log out</button></form>
+      <a href="/sessions">Sessions</a>
+      <a href="/audit">Audit</a>
+      <form method="post" action="/ui/logout" hx-boost="true"><input type="hidden" name="csrf_token" value="{{.CSRFToken}}"><button class="link-button" type="submit">Log out</button></form>
     </nav>
   </header>
   <main class="shell">
@@ -39,6 +43,7 @@
             </div>
             {{if not .Revoked}}
               <form method="post" action="/ui/clients/revoke" hx-boost="true">
+                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                 <input type="hidden" name="client_id" value="{{.ID}}">
                 <button class="danger-button" type="submit">Revoke client</button>
               </form>
@@ -69,6 +74,7 @@
                       <td>
                         {{if eq .Status "active"}}
                           <form method="post" action="/ui/client-sessions/terminate" hx-boost="true">
+                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                             <input type="hidden" name="session_id" value="{{.ID}}">
                             <button class="danger-button" type="submit">Terminate</button>
                           </form>

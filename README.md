@@ -132,6 +132,8 @@ Link a MiniClaude client to the server with:
 /login http://localhost:8080
 ```
 
+The sync server stores Web UI auth only in an `HttpOnly` cookie, uses device-code linking for MiniClaude clients, syncs workspace settings over WebSocket, and lets the Web UI manage providers, clients, sessions, and audit events. Sync credentials are stored separately from `settings.json` under the MiniClaude config directory.
+
 ---
 
 ## Core Features

@@ -28,7 +28,7 @@ type Server struct {
 func New(pool *pgxpool.Pool, authService *auth.Service, deviceService *device.Service, syncService *settingssync.Service, providerStore *providers.Store, hub *syncws.Hub, cookies auth.CookieConfig) http.Handler {
 	server := &Server{pool: pool, mux: http.NewServeMux(), authService: authService, deviceService: deviceService, syncService: syncService, providerStore: providerStore, hub: hub, cookies: cookies}
 	server.routes()
-	return server.mux
+	return secureHeaders(server.mux)
 }
 
 func (s *Server) routes() {
@@ -44,6 +44,8 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /settings", s.settingsPage)
 	s.mux.HandleFunc("POST /ui/settings", s.settingsSaveForm)
 	s.mux.HandleFunc("GET /clients", s.clientsPage)
+	s.mux.HandleFunc("GET /sessions", s.sessionsPage)
+	s.mux.HandleFunc("GET /audit", s.auditPage)
 	s.mux.HandleFunc("POST /ui/clients/revoke", s.clientRevokeForm)
 	s.mux.HandleFunc("POST /ui/client-sessions/terminate", s.clientSessionTerminateForm)
 	s.mux.HandleFunc("GET /device", s.devicePage)

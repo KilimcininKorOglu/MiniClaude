@@ -27,6 +27,7 @@ func (s *Server) signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auth.SetSessionCookie(w, session.Token, session.ExpiresAt, s.cookies)
+	_ = s.audit(r.Context(), session.Principal.WorkspaceID, session.Principal.UserID, "user", "signup_succeeded", map[string]string{"surface": "api"})
 	writeJSON(w, http.StatusCreated, map[string]any{"user": session.Principal})
 }
 
@@ -44,24 +45,28 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 
 	session, err := s.authService.Login(r.Context(), request)
 	if err != nil {
+		_ = s.audit(r.Context(), "", "", "user", "login_failed", map[string]string{"surface": "api"})
 		writeError(w, http.StatusUnauthorized, "invalid credentials")
 		return
 	}
 
 	auth.SetSessionCookie(w, session.Token, session.ExpiresAt, s.cookies)
+	_ = s.audit(r.Context(), session.Principal.WorkspaceID, session.Principal.UserID, "user", "login_succeeded", map[string]string{"surface": "api"})
 	writeJSON(w, http.StatusOK, map[string]any{"user": session.Principal})
 }
 
 func (s *Server) logout(w http.ResponseWriter, r *http.Request) {
 	if s.authService != nil {
 		if cookie, err := r.Cookie(auth.SessionCookieName); err == nil {
-			if _, jti, err := s.authService.Authenticate(r.Context(), cookie.Value); err == nil {
+			if principal, jti, err := s.authService.Authenticate(r.Context(), cookie.Value); err == nil {
 				_ = s.authService.Logout(r.Context(), jti)
+				_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "logout_succeeded", map[string]string{"surface": "api"})
 			}
 		}
 	}
 
 	auth.ClearSessionCookie(w, s.cookies)
+	clearCSRFCookie(w, s.cookies)
 	w.WriteHeader(http.StatusNoContent)
 }
 

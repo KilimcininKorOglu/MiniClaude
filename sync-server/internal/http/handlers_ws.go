@@ -69,7 +69,7 @@ func (s *Server) syncWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updates, unsubscribe := s.hub.Subscribe(principal.WorkspaceID)
+	updates, unsubscribe := s.hub.SubscribeSession(principal.WorkspaceID, principal.ClientID, sessionID)
 	defer unsubscribe()
 	closed := make(chan struct{})
 	go func() {
@@ -97,6 +97,8 @@ func (s *Server) syncWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 		s.touchClientSession(r.Context(), principal.WorkspaceID, principal.ClientID, sessionID)
 		switch message.Type {
+		case "hello":
+			_ = writeMessage(syncws.Message{Type: "hello_ack", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"client_id": principal.ClientID, "session_id": sessionID}})
 		case "settings_push":
 			result, err := s.syncService.Push(r.Context(), principal.WorkspaceID, principal.UserID, settingssync.PushRequest{BaseVersion: message.BaseVersion, Document: message.Document})
 			if err != nil {
@@ -107,7 +109,8 @@ func (s *Server) syncWebSocket(w http.ResponseWriter, r *http.Request) {
 				_ = writeMessage(syncws.Message{Type: "version_reject", WorkspaceID: principal.WorkspaceID, Version: result.Snapshot.Version, Payload: result.Snapshot})
 				continue
 			}
-			s.hub.Broadcast(principal.WorkspaceID, syncws.Message{Type: "settings_updated", WorkspaceID: principal.WorkspaceID, Version: result.Snapshot.Version, Payload: result.Snapshot})
+			_ = writeMessage(syncws.Message{Type: "settings_applied", WorkspaceID: principal.WorkspaceID, Version: result.Snapshot.Version, Payload: result.Snapshot})
+			s.hub.BroadcastExcept(principal.WorkspaceID, sessionID, syncws.Message{Type: "settings_updated", WorkspaceID: principal.WorkspaceID, Version: result.Snapshot.Version, Payload: result.Snapshot})
 		case "ping":
 			_ = writeMessage(syncws.Message{Type: "pong", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"session_id": sessionID}})
 		default:

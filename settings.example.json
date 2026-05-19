@@ -20,6 +20,8 @@
   },
   "effort": "high",
 
+  "// Optional sync server": "Run /login http://localhost:8080 inside MiniClaude to link this settings file to a sync-server workspace. Sync credentials are stored separately under the MiniClaude config directory.",
+
   "// Multi-provider hot switching": "",
   "providers": {
     "deepseek": {

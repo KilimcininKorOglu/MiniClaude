@@ -7,6 +7,7 @@ import { getInitialSettings } from '../../utils/settings/settings.js'
 import { getSettingsForSource } from '../../utils/settings/settings.js'
 import { applyConfigEnvironmentVariables } from '../../utils/managedEnv.js'
 import { logEvent } from '../../services/analytics/index.js'
+import { pushLocalSettingsNow } from '../../services/sync/agent.js'
 
 interface ProviderConfig {
   env: Record<string, string>
@@ -65,6 +66,11 @@ function ProviderSwitch({
 
       // Hot-reload env vars so next API call uses the new endpoint
       applyConfigEnvironmentVariables()
+      const syncError = pushLocalSettingsNow()
+      if (syncError) {
+        onDone(`Provider switched locally, but sync failed: ${syncError.message}`)
+        return
+      }
     }
 
     // Update HUD model display
