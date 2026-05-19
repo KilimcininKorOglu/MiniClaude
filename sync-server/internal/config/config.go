@@ -8,22 +8,28 @@ import (
 )
 
 type Config struct {
-	Addr            string
-	DatabaseURL     string
-	AppURL          string
-	CookieSecure    bool
-	ShutdownTimeout time.Duration
-	MigrationsDir   string
+	Addr                    string
+	DatabaseURL             string
+	AppURL                  string
+	CookieSecure            bool
+	JWTSecret               string
+	ProviderSecretMasterKey string
+	SessionTTL              time.Duration
+	ShutdownTimeout         time.Duration
+	MigrationsDir           string
 }
 
 func Load() (Config, error) {
 	cfg := Config{
-		Addr:            env("SYNC_SERVER_ADDR", ":8080"),
-		DatabaseURL:     env("DATABASE_URL", "postgres://miniclaude:miniclaude@localhost:5432/miniclaude_sync?sslmode=disable"),
-		AppURL:          env("SYNC_SERVER_APP_URL", "http://localhost:8080"),
-		CookieSecure:    envBool("SYNC_SERVER_COOKIE_SECURE", false),
-		ShutdownTimeout: envDuration("SYNC_SERVER_SHUTDOWN_TIMEOUT", 10*time.Second),
-		MigrationsDir:   env("SYNC_SERVER_MIGRATIONS_DIR", "migrations"),
+		Addr:                    env("SYNC_SERVER_ADDR", ":8080"),
+		DatabaseURL:             env("DATABASE_URL", "postgres://miniclaude:miniclaude@localhost:5432/miniclaude_sync?sslmode=disable"),
+		AppURL:                  env("SYNC_SERVER_APP_URL", "http://localhost:8080"),
+		CookieSecure:            envBool("SYNC_SERVER_COOKIE_SECURE", false),
+		JWTSecret:               env("SYNC_SERVER_JWT_SECRET", "dev-jwt-secret-change-me-32-bytes-min"),
+		ProviderSecretMasterKey: env("SYNC_SERVER_PROVIDER_SECRET_KEY", "dev-provider-secret-key-change-me-32"),
+		SessionTTL:              envDuration("SYNC_SERVER_SESSION_TTL", 24*time.Hour),
+		ShutdownTimeout:         envDuration("SYNC_SERVER_SHUTDOWN_TIMEOUT", 10*time.Second),
+		MigrationsDir:           env("SYNC_SERVER_MIGRATIONS_DIR", "migrations"),
 	}
 
 	if cfg.DatabaseURL == "" {
@@ -31,6 +37,12 @@ func Load() (Config, error) {
 	}
 	if cfg.AppURL == "" {
 		return Config{}, fmt.Errorf("SYNC_SERVER_APP_URL is required")
+	}
+	if len(cfg.JWTSecret) < 32 {
+		return Config{}, fmt.Errorf("SYNC_SERVER_JWT_SECRET must be at least 32 bytes")
+	}
+	if len(cfg.ProviderSecretMasterKey) < 32 {
+		return Config{}, fmt.Errorf("SYNC_SERVER_PROVIDER_SECRET_KEY must be at least 32 bytes")
 	}
 
 	return cfg, nil

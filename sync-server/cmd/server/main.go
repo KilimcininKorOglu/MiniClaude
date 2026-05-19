@@ -11,7 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/auth"
 	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/config"
+	providercrypto "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/crypto"
 	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/db"
 	serverhttp "github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/http"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -63,9 +65,18 @@ func run() error {
 }
 
 func serve(cfg config.Config, pool *pgxpool.Pool) error {
+	tokenManager, err := auth.NewTokenManager(cfg.JWTSecret, cfg.SessionTTL)
+	if err != nil {
+		return err
+	}
+	if _, err := providercrypto.NewSecretBox(cfg.ProviderSecretMasterKey); err != nil {
+		return err
+	}
+	authService := auth.NewService(auth.NewStore(pool), tokenManager)
+
 	server := &http.Server{
 		Addr:              cfg.Addr,
-		Handler:           serverhttp.New(pool),
+		Handler:           serverhttp.New(pool, authService, auth.CookieConfig{Secure: cfg.CookieSecure}),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
