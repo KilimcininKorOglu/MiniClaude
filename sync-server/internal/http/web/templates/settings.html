@@ -6,7 +6,7 @@
   <title>{{.Title}} · MiniClaude Sync</title>
   <link rel="stylesheet" href="/web/static/app.css">
   <link rel="icon" href="data:,">
-  <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false, "historyCacheSize": 0}'>
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
 <body>
@@ -26,23 +26,29 @@
       <p class="eyebrow">Settings</p>
       <h1>Workspace settings</h1>
       <p class="muted">Edit the canonical workspace settings document. Stale saves are rejected with the current version.</p>
-      <p class="muted">Version: <code>{{.SettingsVersion}}</code> · Checksum: <code>{{.SettingsChecksum}}</code></p>
     </section>
 
-    {{if .Error}}<section class="alert">{{.Error}}</section>{{end}}
-    {{if .Notice}}<section class="notice">{{.Notice}}</section>{{end}}
-
-    <section class="panel">
-      <form method="post" action="/ui/settings" class="stack" hx-boost="true">
-        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-        <input type="hidden" name="base_version" value="{{.SettingsVersion}}">
-        <label>
-          Settings JSON
-          <textarea name="document" spellcheck="false" rows="22">{{.SettingsDocument}}</textarea>
-        </label>
-        <button type="submit">Save settings</button>
-      </form>
-    </section>
+    {{template "settings_content" .}}
   </main>
 </body>
 </html>
+
+{{define "settings_content"}}
+<div id="settings-content">
+  <p class="muted">Version: <code>{{.SettingsVersion}}</code> · Checksum: <code>{{.SettingsChecksum}}</code></p>
+  {{if .Error}}<section class="alert">{{.Error}}</section>{{end}}
+  {{if .Notice}}<section class="notice">{{.Notice}}</section>{{end}}
+
+  <section class="panel">
+    <form method="post" action="/ui/settings" class="stack" hx-post="/ui/settings" hx-target="#settings-content" hx-swap="outerHTML">
+      <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+      <input type="hidden" name="base_version" value="{{.SettingsVersion}}">
+      <label>
+        Settings JSON
+        <textarea name="document" spellcheck="false" rows="22">{{.SettingsDocument}}</textarea>
+      </label>
+      <button type="submit">Save settings</button>
+    </form>
+  </section>
+</div>
+{{end}}

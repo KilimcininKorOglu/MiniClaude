@@ -1,4 +1,5 @@
 import {
+  deleteStoredSyncCredentials,
   getSyncCredentialsPath,
   loadStoredSyncCredentials,
   saveStoredSyncCredentials,
@@ -13,6 +14,10 @@ export function loadSyncCredentials(): SyncCredentials | null {
 
 export function saveSyncCredentials(credentials: SyncCredentials): void {
   saveStoredSyncCredentials(credentials)
+}
+
+export function deleteSyncCredentials(): void {
+  deleteStoredSyncCredentials()
 }
 
 export function updateSyncCredentials(

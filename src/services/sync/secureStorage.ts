@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
 import { getClaudeConfigHomeDir } from '../../utils/envUtils.js'
 import { safeParseJSON } from '../../utils/json.js'
@@ -34,4 +34,8 @@ export function saveStoredSyncCredentials(credentials: SyncCredentials): void {
   writeFileSync(credentialsPath, jsonStringify(credentials, null, 2) + '\n', {
     mode: 0o600,
   })
+}
+
+export function deleteStoredSyncCredentials(): void {
+  if (existsSync(credentialsPath)) unlinkSync(credentialsPath)
 }

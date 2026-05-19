@@ -121,3 +121,27 @@ func TestRequireCSRFAcceptsMatchingToken(t *testing.T) {
 		t.Fatal("expected matching CSRF token to be accepted")
 	}
 }
+
+func TestRequireOwnerOrAdminAcceptsOwner(t *testing.T) {
+	server := &Server{}
+	response := httptest.NewRecorder()
+
+	if !server.requireOwnerOrAdmin(response, auth.Principal{Role: "owner"}) {
+		t.Fatal("expected owner role to be accepted")
+	}
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected response to remain untouched, got %d", response.Code)
+	}
+}
+
+func TestRequireOwnerOrAdminRejectsMember(t *testing.T) {
+	server := &Server{}
+	response := httptest.NewRecorder()
+
+	if server.requireOwnerOrAdmin(response, auth.Principal{Role: "member"}) {
+		t.Fatal("expected member role to be rejected")
+	}
+	if response.Code != http.StatusForbidden {
+		t.Fatalf("expected 403, got %d", response.Code)
+	}
+}

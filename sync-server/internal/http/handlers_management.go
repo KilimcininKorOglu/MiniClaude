@@ -69,6 +69,9 @@ func (s *Server) providerSaveForm(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
+	if !s.requireOwnerOrAdmin(w, principal) {
+		return
+	}
 	if s.providerStore == nil {
 		s.render(w, r, http.StatusServiceUnavailable, "providers.html", pageData{Title: "Providers", Principal: principal, Error: "Provider store is not available."})
 		return
@@ -99,12 +102,19 @@ func (s *Server) providerSaveForm(w http.ResponseWriter, r *http.Request) {
 	_ = s.bumpSettingsVersion(r.Context(), principal.WorkspaceID, principal.UserID, "provider_saved", map[string]string{"provider_id": providerID, "name": strings.TrimSpace(r.FormValue("name"))})
 	_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "provider_saved", map[string]string{"provider_id": providerID, "name": strings.TrimSpace(r.FormValue("name"))})
 	s.broadcastSnapshot(r.Context(), principal.WorkspaceID)
+	if isHTMX(r) {
+		s.renderProvidersContent(w, r, http.StatusOK, principal, "", "Provider saved.")
+		return
+	}
 	http.Redirect(w, r, "/providers", http.StatusSeeOther)
 }
 
 func (s *Server) providerDeleteForm(w http.ResponseWriter, r *http.Request) {
 	principal, ok := s.requireHTMLAuth(w, r)
 	if !ok {
+		return
+	}
+	if !s.requireOwnerOrAdmin(w, principal) {
 		return
 	}
 	if s.providerStore == nil {
@@ -126,6 +136,10 @@ func (s *Server) providerDeleteForm(w http.ResponseWriter, r *http.Request) {
 	_ = s.bumpSettingsVersion(r.Context(), principal.WorkspaceID, principal.UserID, "provider_deleted", map[string]string{"provider_id": providerID})
 	_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "provider_deleted", map[string]string{"provider_id": providerID})
 	s.broadcastSnapshot(r.Context(), principal.WorkspaceID)
+	if isHTMX(r) {
+		s.renderProvidersContent(w, r, http.StatusOK, principal, "", "Provider deleted.")
+		return
+	}
 	http.Redirect(w, r, "/providers", http.StatusSeeOther)
 }
 
@@ -147,6 +161,9 @@ func (s *Server) settingsSaveForm(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
+	if !s.requireOwnerOrAdmin(w, principal) {
+		return
+	}
 	if !s.requireCSRF(w, r) {
 		return
 	}
@@ -158,6 +175,10 @@ func (s *Server) settingsSaveForm(w http.ResponseWriter, r *http.Request) {
 	if !json.Valid(document) {
 		data, _ := s.settingsPageData(r.Context(), principal, "Settings document must be valid JSON.", "")
 		data.SettingsDocument = string(document)
+		if isHTMX(r) {
+			s.renderPartial(w, r, http.StatusOK, "settings_content", data)
+			return
+		}
 		s.render(w, r, http.StatusBadRequest, "settings.html", data)
 		return
 	}
@@ -174,6 +195,10 @@ func (s *Server) settingsSaveForm(w http.ResponseWriter, r *http.Request) {
 	}
 	if !result.Accepted {
 		data, _ := s.settingsPageData(r.Context(), principal, "Settings changed elsewhere. Review the latest version and save again.", "")
+		if isHTMX(r) {
+			s.renderPartial(w, r, http.StatusOK, "settings_content", data)
+			return
+		}
 		s.render(w, r, http.StatusConflict, "settings.html", data)
 		return
 	}
@@ -184,12 +209,19 @@ func (s *Server) settingsSaveForm(w http.ResponseWriter, r *http.Request) {
 		s.render(w, r, http.StatusBadRequest, "settings.html", pageData{Title: "Settings", Principal: principal, Error: err.Error()})
 		return
 	}
+	if isHTMX(r) {
+		s.renderPartial(w, r, http.StatusOK, "settings_content", data)
+		return
+	}
 	s.render(w, r, http.StatusOK, "settings.html", data)
 }
 
 func (s *Server) clientRenameForm(w http.ResponseWriter, r *http.Request) {
 	principal, ok := s.requireHTMLAuth(w, r)
 	if !ok {
+		return
+	}
+	if !s.requireOwnerOrAdmin(w, principal) {
 		return
 	}
 	if !s.requireCSRF(w, r) {
@@ -218,12 +250,19 @@ func (s *Server) clientRenameForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "client_renamed", map[string]string{"client_id": clientID, "name": name})
+	if isHTMX(r) {
+		s.renderClientsContent(w, r, http.StatusOK, principal, "", "Client renamed.")
+		return
+	}
 	http.Redirect(w, r, "/clients", http.StatusSeeOther)
 }
 
 func (s *Server) clientRevokeForm(w http.ResponseWriter, r *http.Request) {
 	principal, ok := s.requireHTMLAuth(w, r)
 	if !ok {
+		return
+	}
+	if !s.requireOwnerOrAdmin(w, principal) {
 		return
 	}
 	if !s.requireCSRF(w, r) {
@@ -248,7 +287,11 @@ func (s *Server) clientRevokeForm(w http.ResponseWriter, r *http.Request) {
 	`, principal.WorkspaceID, clientID)
 	_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "client_revoked", map[string]string{"client_id": clientID})
 	if s.hub != nil {
-		s.hub.SendClient(principal.WorkspaceID, clientID, syncws.Message{Type: "terminate_session", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"client_id": clientID}})
+		s.hub.SendClient(principal.WorkspaceID, clientID, syncws.Message{Type: "terminate_session", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"client_id": clientID, "reason": "client_revoked"}})
+	}
+	if isHTMX(r) {
+		s.renderClientsContent(w, r, http.StatusOK, principal, "", "Client revoked.")
+		return
 	}
 	http.Redirect(w, r, "/clients", http.StatusSeeOther)
 }
@@ -256,6 +299,9 @@ func (s *Server) clientRevokeForm(w http.ResponseWriter, r *http.Request) {
 func (s *Server) clientSessionTerminateForm(w http.ResponseWriter, r *http.Request) {
 	principal, ok := s.requireHTMLAuth(w, r)
 	if !ok {
+		return
+	}
+	if !s.requireOwnerOrAdmin(w, principal) {
 		return
 	}
 	if !s.requireCSRF(w, r) {
@@ -278,10 +324,18 @@ func (s *Server) clientSessionTerminateForm(w http.ResponseWriter, r *http.Reque
 	}
 	_ = s.audit(r.Context(), principal.WorkspaceID, principal.UserID, "user", "client_session_terminated", map[string]string{"client_id": clientID, "session_id": sessionID})
 	if s.hub != nil {
-		message := syncws.Message{Type: "terminate_session", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"client_id": clientID, "session_id": sessionID}}
+		message := syncws.Message{Type: "terminate_session", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"client_id": clientID, "session_id": sessionID, "reason": "session_terminated"}}
 		if !s.hub.SendSession(principal.WorkspaceID, sessionID, message) {
 			s.hub.SendClient(principal.WorkspaceID, clientID, message)
 		}
+	}
+	if isHTMX(r) {
+		if r.FormValue("return_to") == "sessions" {
+			s.renderSessionsContent(w, r, http.StatusOK, principal, "", "Session terminated.")
+			return
+		}
+		s.renderClientsContent(w, r, http.StatusOK, principal, "", "Session terminated.")
+		return
 	}
 	http.Redirect(w, r, "/clients", http.StatusSeeOther)
 }
@@ -500,11 +554,39 @@ func (s *Server) broadcastSnapshot(ctx context.Context, workspaceID string) {
 }
 
 func (s *Server) renderProvidersError(w http.ResponseWriter, r *http.Request, principal auth.Principal, err error) {
+	s.renderProvidersContent(w, r, http.StatusBadRequest, principal, err.Error(), "")
+}
+
+func (s *Server) renderProvidersContent(w http.ResponseWriter, r *http.Request, status int, principal auth.Principal, errorMessage, notice string) {
 	providers, _ := s.providerViews(r.Context(), principal.WorkspaceID)
-	s.render(w, r, http.StatusBadRequest, "providers.html", pageData{Title: "Providers", Principal: principal, Providers: providers, Error: err.Error()})
+	data := pageData{Title: "Providers", Principal: principal, Providers: providers, Error: errorMessage, Notice: notice}
+	if isHTMX(r) {
+		s.renderPartial(w, r, http.StatusOK, "providers_content", data)
+		return
+	}
+	s.render(w, r, status, "providers.html", data)
 }
 
 func (s *Server) renderClientsError(w http.ResponseWriter, r *http.Request, principal auth.Principal, err error) {
+	s.renderClientsContent(w, r, http.StatusBadRequest, principal, err.Error(), "")
+}
+
+func (s *Server) renderClientsContent(w http.ResponseWriter, r *http.Request, status int, principal auth.Principal, errorMessage, notice string) {
 	clients, _ := s.clientViews(r.Context(), principal.WorkspaceID)
-	s.render(w, r, http.StatusBadRequest, "clients.html", pageData{Title: "Clients", Principal: principal, Clients: clients, Error: err.Error()})
+	data := pageData{Title: "Clients", Principal: principal, Clients: clients, Error: errorMessage, Notice: notice}
+	if isHTMX(r) {
+		s.renderPartial(w, r, http.StatusOK, "clients_content", data)
+		return
+	}
+	s.render(w, r, status, "clients.html", data)
+}
+
+func (s *Server) renderSessionsContent(w http.ResponseWriter, r *http.Request, status int, principal auth.Principal, errorMessage, notice string) {
+	sessions, _ := s.workspaceSessionViews(r.Context(), principal.WorkspaceID)
+	data := pageData{Title: "Sessions", Principal: principal, Sessions: sessions, Error: errorMessage, Notice: notice}
+	if isHTMX(r) {
+		s.renderPartial(w, r, http.StatusOK, "sessions_content", data)
+		return
+	}
+	s.render(w, r, status, "sessions.html", data)
 }

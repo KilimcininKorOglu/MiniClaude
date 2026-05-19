@@ -1,3 +1,4 @@
+import { createHash } from 'crypto'
 import { dirname } from 'path'
 import { writeFileSyncAndFlush_DEPRECATED } from '../../utils/file.js'
 import { getFsImplementation } from '../../utils/fsOperations.js'
@@ -10,6 +11,11 @@ import {
 import { resetSettingsCache } from '../../utils/settings/settingsCache.js'
 import { loadSyncCredentials, updateSyncCredentials } from './credentials.js'
 import type { SettingsSnapshot } from './types.js'
+
+type LocalSettingsPush = {
+  checksum: string
+  message: Record<string, unknown>
+}
 
 export function applySettingsSnapshot(snapshot: SettingsSnapshot): Error | null {
   const filePath = getSettingsFilePathForSource('userSettings')
@@ -26,6 +32,7 @@ export function applySettingsSnapshot(snapshot: SettingsSnapshot): Error | null 
     updateSyncCredentials(credentials => ({
       ...credentials,
       settingsVersion: snapshot.version,
+      settingsChecksum: checksumDocument(snapshot.document),
     }))
     return null
   } catch (error) {
@@ -33,14 +40,27 @@ export function applySettingsSnapshot(snapshot: SettingsSnapshot): Error | null 
   }
 }
 
-export function localSettingsPushMessage(): Record<string, unknown> | null {
+export function localSettingsPushMessage(): LocalSettingsPush | null {
   const credentials = loadSyncCredentials()
   if (!credentials) return null
+  const document = getSettingsForSource('userSettings') ?? {}
   return {
-    type: 'settings_push',
-    base_version: credentials.settingsVersion ?? 0,
-    document: getSettingsForSource('userSettings') ?? {},
+    checksum: checksumDocument(document),
+    message: {
+      type: 'settings_push',
+      base_version: credentials.settingsVersion ?? 0,
+      document,
+    },
   }
+}
+
+export function localSettingsChecksum(): string | null {
+  const document = getSettingsForSource('userSettings') ?? {}
+  return checksumDocument(document)
+}
+
+export function settingsFilePath(): string | null {
+  return getSettingsFilePathForSource('userSettings') ?? null
 }
 
 export function snapshotFromPayload(payload: unknown): SettingsSnapshot | null {
@@ -57,4 +77,26 @@ export function snapshotFromPayload(payload: unknown): SettingsSnapshot | null {
     return null
   }
   return value as SettingsSnapshot
+}
+
+function checksumDocument(document: Record<string, unknown>): string {
+  return createHash('sha256').update(stableStringify(document)).digest('hex')
+}
+
+function stableStringify(value: unknown): string {
+  return JSON.stringify(sortValue(value)) ?? 'null'
+}
+
+function sortValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(sortValue)
+  }
+  if (!value || typeof value !== 'object') {
+    return value
+  }
+  const sorted: Record<string, unknown> = {}
+  for (const key of Object.keys(value as Record<string, unknown>).sort()) {
+    sorted[key] = sortValue((value as Record<string, unknown>)[key])
+  }
+  return sorted
 }

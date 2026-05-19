@@ -6,7 +6,7 @@
   <title>{{.Title}} · MiniClaude Sync</title>
   <link rel="stylesheet" href="/web/static/app.css">
   <link rel="icon" href="data:,">
-  <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false, "historyCacheSize": 0}'>
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
 <body>
@@ -28,84 +28,91 @@
       <p class="muted">Review linked MiniClaude clients, revoke client tokens, and terminate active sessions.</p>
     </section>
 
-    {{if .Error}}<section class="alert">{{.Error}}</section>{{end}}
-
-    {{if .Clients}}
-      {{range .Clients}}
-        <section class="panel">
-          <div class="split-row">
-            <div>
-              <h2>{{.Name}}</h2>
-              <p class="muted">Client ID: <code>{{.ID}}</code></p>
-              <p class="muted">Created: {{.CreatedAt}}{{if .LastSeenAt}} · Last seen: {{.LastSeenAt}}{{end}}</p>
-              {{if .MachineID}}<p class="muted">Machine: {{.MachineID}}</p>{{end}}
-              {{if .Revoked}}<p class="badge danger">Revoked</p>{{else}}<p class="badge">Active</p>{{end}}
-            </div>
-            {{if not .Revoked}}
-              <div class="actions-column">
-                <form method="post" action="/ui/clients/rename" class="inline-form" hx-boost="true">
-                  <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
-                  <input type="hidden" name="client_id" value="{{.ID}}">
-                  <input name="name" value="{{.Name}}" required aria-label="Client name">
-                  <button type="submit">Rename</button>
-                </form>
-                <form method="post" action="/ui/clients/revoke" hx-boost="true">
-                  <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
-                  <input type="hidden" name="client_id" value="{{.ID}}">
-                  <button class="danger-button" type="submit">Revoke client</button>
-                </form>
-              </div>
-            {{end}}
-          </div>
-
-          {{if .Sessions}}
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Session</th>
-                    <th>Status</th>
-                    <th>Process</th>
-                    <th>Connected</th>
-                    <th>Last seen</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {{range .Sessions}}
-                    <tr>
-                      <td><code>{{.ID}}</code></td>
-                      <td>{{.Status}}</td>
-                      <td>{{.ProcessID}}</td>
-                      <td>{{.ConnectedAt}}</td>
-                      <td>{{.LastSeenAt}}</td>
-                      <td>
-                        {{if eq .Status "active"}}
-                          <form method="post" action="/ui/client-sessions/terminate" hx-boost="true">
-                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
-                            <input type="hidden" name="session_id" value="{{.ID}}">
-                            <button class="danger-button" type="submit">Terminate</button>
-                          </form>
-                        {{else}}
-                          {{.TerminatedAt}}
-                        {{end}}
-                      </td>
-                    </tr>
-                  {{end}}
-                </tbody>
-              </table>
-            </div>
-          {{else}}
-            <p class="muted">No sessions recorded for this client yet.</p>
-          {{end}}
-        </section>
-      {{end}}
-    {{else}}
-      <section class="empty-state">
-        <h2>No clients linked</h2>
-        <p>Run <code>/login http://localhost:8080</code> in MiniClaude and approve the browser prompt to link a client.</p>
-      </section>
-    {{end}}
+    {{template "clients_content" .}}
   </main>
 </body>
 </html>
+
+{{define "clients_content"}}
+<div id="clients-content">
+  {{if .Error}}<section class="alert">{{.Error}}</section>{{end}}
+  {{if .Notice}}<section class="notice">{{.Notice}}</section>{{end}}
+
+  {{if .Clients}}
+    {{range .Clients}}
+      <section class="panel">
+        <div class="split-row">
+          <div>
+            <h2>{{.Name}}</h2>
+            <p class="muted">Client ID: <code>{{.ID}}</code></p>
+            <p class="muted">Created: {{.CreatedAt}}{{if .LastSeenAt}} · Last seen: {{.LastSeenAt}}{{end}}</p>
+            {{if .MachineID}}<p class="muted">Machine: {{.MachineID}}</p>{{end}}
+            {{if .Revoked}}<p class="badge danger">Revoked</p>{{else}}<p class="badge">Active</p>{{end}}
+          </div>
+          {{if not .Revoked}}
+            <div class="actions-column">
+              <form method="post" action="/ui/clients/rename" class="inline-form" hx-post="/ui/clients/rename" hx-target="#clients-content" hx-swap="outerHTML">
+                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                <input type="hidden" name="client_id" value="{{.ID}}">
+                <input name="name" value="{{.Name}}" required aria-label="Client name">
+                <button type="submit">Rename</button>
+              </form>
+              <form method="post" action="/ui/clients/revoke" hx-post="/ui/clients/revoke" hx-target="#clients-content" hx-swap="outerHTML">
+                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                <input type="hidden" name="client_id" value="{{.ID}}">
+                <button class="danger-button" type="submit">Revoke client</button>
+              </form>
+            </div>
+          {{end}}
+        </div>
+
+        {{if .Sessions}}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Session</th>
+                  <th>Status</th>
+                  <th>Process</th>
+                  <th>Connected</th>
+                  <th>Last seen</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{range .Sessions}}
+                  <tr>
+                    <td><code>{{.ID}}</code></td>
+                    <td>{{.Status}}</td>
+                    <td>{{.ProcessID}}</td>
+                    <td>{{.ConnectedAt}}</td>
+                    <td>{{.LastSeenAt}}</td>
+                    <td>
+                      {{if eq .Status "active"}}
+                        <form method="post" action="/ui/client-sessions/terminate" hx-post="/ui/client-sessions/terminate" hx-target="#clients-content" hx-swap="outerHTML">
+                          <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                          <input type="hidden" name="session_id" value="{{.ID}}">
+                          <button class="danger-button" type="submit">Terminate</button>
+                        </form>
+                      {{else}}
+                        {{.TerminatedAt}}
+                      {{end}}
+                    </td>
+                  </tr>
+                {{end}}
+              </tbody>
+            </table>
+          </div>
+        {{else}}
+          <p class="muted">No sessions recorded for this client yet.</p>
+        {{end}}
+      </section>
+    {{end}}
+  {{else}}
+    <section class="empty-state">
+      <h2>No clients linked</h2>
+      <p>Run <code>/login http://localhost:8080</code> in MiniClaude and approve the browser prompt to link a client.</p>
+    </section>
+  {{end}}
+</div>
+{{end}}

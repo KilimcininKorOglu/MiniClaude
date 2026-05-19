@@ -35,6 +35,14 @@ func (s *Server) templates() (*template.Template, error) {
 }
 
 func (s *Server) render(w http.ResponseWriter, r *http.Request, status int, name string, data pageData) {
+	s.renderTemplate(w, r, status, name, data)
+}
+
+func (s *Server) renderPartial(w http.ResponseWriter, r *http.Request, status int, name string, data pageData) {
+	s.renderTemplate(w, r, status, name, data)
+}
+
+func (s *Server) renderTemplate(w http.ResponseWriter, r *http.Request, status int, name string, data pageData) {
 	if data.Principal.UserID != "" {
 		data.CSRFToken = s.csrfToken(w, r)
 	}
@@ -48,6 +56,10 @@ func (s *Server) render(w http.ResponseWriter, r *http.Request, status int, name
 	if err := templates.ExecuteTemplate(w, name, data); err != nil {
 		http.Error(w, "template error", http.StatusInternalServerError)
 	}
+}
+
+func isHTMX(r *http.Request) bool {
+	return r.Header.Get("HX-Request") == "true"
 }
 
 func (s *Server) homePage(w http.ResponseWriter, r *http.Request) {
@@ -171,6 +183,14 @@ func (s *Server) requireHTMLAuth(w http.ResponseWriter, r *http.Request) (auth.P
 		return auth.Principal{}, false
 	}
 	return principal, true
+}
+
+func (s *Server) requireOwnerOrAdmin(w http.ResponseWriter, principal auth.Principal) bool {
+	if principal.Role == "owner" || principal.Role == "admin" {
+		return true
+	}
+	writeError(w, http.StatusForbidden, "workspace role is not allowed to perform this action")
+	return false
 }
 
 func safeNextPath(next string) string {

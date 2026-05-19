@@ -53,7 +53,7 @@ The server-rendered Web UI exposes:
 - `GET /audit` for recent workspace audit events.
 - `GET /device` and `POST /device` for browser approval of MiniClaude device-code login requests.
 
-Form submissions use same-origin POST routes, CSRF tokens, and security headers. The JWT is stored only in the `miniclaude_sync_session` cookie with `HttpOnly` and `SameSite=Lax`; set `SYNC_SERVER_COOKIE_SECURE=true` in HTTPS environments.
+Form submissions use same-origin POST routes, CSRF tokens, and security headers. Provider, settings, client, and session mutation forms require an `owner` or `admin` workspace role. HTMX form submissions refresh only the affected panel; directly opened pages still render as full server-side HTML. The JWT is stored only in the `miniclaude_sync_session` cookie with `HttpOnly` and `SameSite=Lax`; set `SYNC_SERVER_COOKIE_SECURE=true` in HTTPS environments.
 
 ## MiniClaude client login
 
@@ -63,7 +63,7 @@ Start the server, sign in through the Web UI, then link a local MiniClaude clien
 /login http://localhost:8080
 ```
 
-The command starts a device-code request, opens the browser approval page, polls for approval, and stores the returned client token under the MiniClaude config directory. The approved device code is consumed on the first successful poll and cannot be exchanged for another token. Subsequent MiniClaude startup connects to `/api/sync/ws`, sends `hello`, applies workspace snapshots to `userSettings`, pushes local settings changes as `settings_push`, handles `settings_applied` and `version_reject`, and accepts targeted `terminate_session` messages.
+The command starts a device-code request, opens the browser approval page, polls for approval, and stores the returned client token under the MiniClaude config directory. The approved device code is consumed on the first successful poll and cannot be exchanged for another token. Subsequent MiniClaude startup connects to `/api/sync/ws`, sends `hello`, applies workspace snapshots to `userSettings`, watches local `userSettings` changes with debounce, pushes changed local snapshots as `settings_push`, handles `settings_applied` and `version_reject`, reconnects after transient WebSocket disconnects, and accepts targeted `terminate_session` messages. A session terminate clears only the active session ID; a client revoke removes the local sync credentials and requires `/login` before relinking.
 
 ## Sync API
 
@@ -73,8 +73,10 @@ The sync API exposes:
 - `POST /api/device/approve` to approve a user code from an authenticated web session.
 - `POST /api/device/poll` to exchange an approved device code for a client access token. The first successful exchange consumes the request.
 - `GET /api/settings/snapshot` to read the workspace settings document.
-- `POST /api/settings/push` to update settings with base-version checking; stale writes return `409` with `version_reject`.
+- `POST /api/settings/push` to update settings with base-version checking. Accepted writes return `settings_applied` with `workspace_id`, `version`, `checksum`, and `document`; stale writes return `409` with `version_reject` and the current snapshot fields.
 - `GET /api/sync/ws` for client WebSocket sync using a bearer client token. The WebSocket protocol supports `hello`, `snapshot`, `settings_push`, `settings_applied`, `settings_updated`, `version_reject`, `ping`, `pong`, and targeted `terminate_session`.
+
+The sync contract is full-snapshot based. `settings_events` records each accepted push for audit and future replay work, but clients reconcile from the latest snapshot rather than an incremental event stream.
 
 ## Auth API
 
@@ -94,18 +96,22 @@ Before shipping sync-server changes, verify:
 - Signup, login, logout, and dashboard access through the Web UI.
 - CSRF rejection for Web UI POST routes when the hidden token is missing or invalid.
 - Provider create, update, delete, and encrypted secret storage.
+- Role rejection for provider, settings, client, and session mutation forms when the workspace role is not `owner` or `admin`.
+- HTMX provider, settings, client, and sessions forms refresh the affected panel without changing the current URL.
 - Settings save success and stale-version conflict handling.
+- Local MiniClaude `userSettings` edits are debounced and pushed to the server without creating a remote-apply loop.
 - Audit and sessions pages at `GET /audit` and `GET /sessions`.
 - Device login start, browser approval, first poll token exchange, and second poll no-token behavior.
 - WebSocket `hello`, initial snapshot, `settings_push`, `settings_applied`, `settings_updated`, and `version_reject` behavior with two MiniClaude clients.
-- Targeted session termination from the Web UI.
+- Targeted session termination from the Web UI, including local session ID cleanup and user-visible termination messaging.
+- Client revoke removes local sync credentials and does not reconnect until `/login` is run again.
 - Browser storage contains no auth token in localStorage or sessionStorage.
 - `SYNC_SERVER_COOKIE_SECURE=true` is enabled for HTTPS deployments.
 - Docker Compose and Coolify health checks pass on `/healthz`.
 
 ## Migration policy
 
-Migration files use paired `*.up.sql` and `*.down.sql` files. Every schema change must include a rollback file and should run inside the migration transaction.
+Migration files use paired `*.up.sql` and `*.down.sql` files. Every schema change must include a rollback file and should run inside the migration transaction. The sync-server GitHub Actions workflow runs `make migrate-up && make migrate-down` against a PostgreSQL service to smoke-test migration reversibility.
 
 ## Coolify
 

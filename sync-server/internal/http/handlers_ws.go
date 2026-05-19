@@ -65,7 +65,7 @@ func (s *Server) syncWebSocket(w http.ResponseWriter, r *http.Request) {
 		_ = writeMessage(syncws.Message{Type: "error", Payload: err.Error()})
 		return
 	}
-	if err := writeMessage(syncws.Message{Type: "snapshot", WorkspaceID: principal.WorkspaceID, Version: snapshot.Version, Payload: snapshot}); err != nil {
+	if err := writeMessage(settingsMessage("snapshot", snapshot)); err != nil {
 		return
 	}
 
@@ -106,11 +106,11 @@ func (s *Server) syncWebSocket(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 			if !result.Accepted {
-				_ = writeMessage(syncws.Message{Type: "version_reject", WorkspaceID: principal.WorkspaceID, Version: result.Snapshot.Version, Payload: result.Snapshot})
+				_ = writeMessage(settingsMessage("version_reject", result.Snapshot))
 				continue
 			}
-			_ = writeMessage(syncws.Message{Type: "settings_applied", WorkspaceID: principal.WorkspaceID, Version: result.Snapshot.Version, Payload: result.Snapshot})
-			s.hub.BroadcastExcept(principal.WorkspaceID, sessionID, syncws.Message{Type: "settings_updated", WorkspaceID: principal.WorkspaceID, Version: result.Snapshot.Version, Payload: result.Snapshot})
+			_ = writeMessage(settingsMessage("settings_applied", result.Snapshot))
+			s.hub.BroadcastExcept(principal.WorkspaceID, sessionID, settingsMessage("settings_updated", result.Snapshot))
 		case "ping":
 			_ = writeMessage(syncws.Message{Type: "pong", WorkspaceID: principal.WorkspaceID, Payload: map[string]string{"session_id": sessionID}})
 		default:

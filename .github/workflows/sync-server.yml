@@ -18,6 +18,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: miniclaude
+          POSTGRES_PASSWORD: miniclaude
+          POSTGRES_DB: miniclaude_sync
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U miniclaude -d miniclaude_sync"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://miniclaude:miniclaude@localhost:5432/miniclaude_sync?sslmode=disable
+      SYNC_SERVER_JWT_SECRET: ci-jwt-secret-with-at-least-32-bytes
+      SYNC_SERVER_PROVIDER_SECRET_KEY: ci-provider-key-with-at-least-32-bytes
     defaults:
       run:
         working-directory: ./sync-server
@@ -42,3 +60,6 @@ jobs:
 
       - name: Build
         run: go build -o bin/sync-server ./cmd/server
+
+      - name: Migration smoke
+        run: make migrate-up && make migrate-down
