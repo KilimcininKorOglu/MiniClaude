@@ -16,6 +16,8 @@ For a full local stack:
 docker compose up --build
 ```
 
+The local Docker stack exposes PostgreSQL on `localhost:5432` and the server on `http://localhost:8080`.
+
 ## Commands
 
 ```bash
@@ -42,17 +44,28 @@ make migrate-down
 
 ## Web UI
 
-The initial server-rendered Web UI exposes:
+The server-rendered Web UI exposes:
 
 - `GET /login` and `GET /signup` for browser auth.
 - `GET /dashboard` for the authenticated workspace landing page.
 - `GET /providers` and `GET /clients` as authenticated management pages.
+- `GET /device` and `POST /device` for browser approval of MiniClaude device-code login requests.
 
 Form submissions use same-origin POST routes and store the JWT only in the `miniclaude_sync_session` cookie.
 
+## MiniClaude client login
+
+Start the server, sign in through the Web UI, then link a local MiniClaude client:
+
+```text
+/login http://localhost:8080
+```
+
+The command starts a device-code request, opens the browser approval page, polls for approval, and stores the returned client token under the MiniClaude config directory. Subsequent MiniClaude startup connects to `/api/sync/ws` and applies workspace snapshots to `userSettings`.
+
 ## Sync API
 
-The initial sync API exposes:
+The sync API exposes:
 
 - `POST /api/device/start` to create a device-code login request.
 - `POST /api/device/approve` to approve a user code from an authenticated web session.
@@ -79,3 +92,24 @@ Migration files use paired `*.up.sql` and `*.down.sql` files. Every schema chang
 ## Coolify
 
 Use `Dockerfile` as the build source and configure environment variables from `coolify.example.env`. PostgreSQL can be attached as a Coolify database resource or provided through `DATABASE_URL`.
+
+Recommended Coolify settings:
+
+- Build pack: Dockerfile.
+- Exposed port: `8080`.
+- Health check path: `/healthz`.
+- Set `SYNC_SERVER_APP_URL` to the public HTTPS URL.
+- Set `SYNC_SERVER_COOKIE_SECURE=true` for HTTPS deployments.
+- Generate unique production values for `SYNC_SERVER_JWT_SECRET` and `SYNC_SERVER_PROVIDER_SECRET_KEY`; both must be at least 32 bytes.
+
+Run migrations before serving a fresh database:
+
+```bash
+sync-server migrate up
+```
+
+Rollback is available through:
+
+```bash
+sync-server migrate down
+```

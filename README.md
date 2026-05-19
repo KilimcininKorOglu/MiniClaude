@@ -32,7 +32,7 @@
 MiniClaude removes **92,000 lines** of cloud/telemetry/collaboration code from Claude Code.
 
 - **Minimal** — 100% core features retained, all cloud dependencies removed
-- **Secure** — No telemetry, no tracking, no sync — fully local
+- **Secure** — No telemetry, no tracking, no vendor sync — local by default
 - **Fast** — Single binary, `bun run build && ./cli` to start
 - **Complete** — AI chat, code gen, file ops, Git, MCP, plugins, skills
 
@@ -107,6 +107,30 @@ Windows users can double-click `start.bat` for dev mode.
 ```
 
 Providers are configured in `settings.json` under the `providers` key. No restart needed.
+
+### Optional sync server
+
+The `sync-server/` package provides an optional self-hosted Go + HTMX + PostgreSQL service for workspace-scoped login and settings sync.
+
+```bash
+cd sync-server
+cp .env.example .env
+make migrate-up
+make dev
+```
+
+For a local container stack, run:
+
+```bash
+cd sync-server
+docker compose up --build
+```
+
+Link a MiniClaude client to the server with:
+
+```bash
+/login http://localhost:8080
+```
 
 ---
 
