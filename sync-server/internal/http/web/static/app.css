@@ -167,6 +167,10 @@ nav a[aria-current="page"] {
   padding: 2rem 1.5rem;
 }
 
+.shell.narrow {
+  width: min(100%, 42rem);
+}
+
 .hero-panel {
   padding: 2rem;
 }
@@ -189,9 +193,31 @@ nav a[aria-current="page"] {
   border-color: var(--accent);
 }
 
-.empty-state {
+.empty-state,
+.panel {
   margin-top: 1rem;
   padding: 2rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 24px 80px rgb(24 32 47 / 8%);
+}
+
+.button-link {
+  display: inline-block;
+  border-radius: .65rem;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  padding: .85rem 1rem;
+}
+
+.button-link:hover {
+  background: var(--accent-dark);
+  text-decoration: none;
 }
 
 code {

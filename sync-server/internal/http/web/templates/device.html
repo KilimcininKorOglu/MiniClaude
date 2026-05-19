@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · MiniClaude Sync</title>
+  <link rel="stylesheet" href="/web/static/app.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/dashboard">MiniClaude Sync</a>
+    <nav>
+      <a href="/providers">Providers</a>
+      <a href="/clients">Clients</a>
+      <form method="post" action="/ui/logout" hx-boost="true"><button class="link-button" type="submit">Log out</button></form>
+    </nav>
+  </header>
+  <main class="shell narrow">
+    <section class="hero-panel">
+      <p class="eyebrow">Device login</p>
+      <h1>Link MiniClaude</h1>
+      <p class="muted">Approve the code shown by your MiniClaude client for {{.Principal.Username}}.</p>
+    </section>
+    {{if .Error}}<div class="alert">{{.Error}}</div>{{end}}
+    {{if .ClientID}}
+      <section class="panel">
+        <h2>Device linked</h2>
+        <p class="muted">Client {{.ClientID}} can now sync this workspace.</p>
+        <a class="button-link" href="/clients">View clients</a>
+      </section>
+    {{else}}
+      <form method="post" action="/device" class="panel stack" hx-boost="true">
+        <label>
+          User code
+          <input name="user_code" value="{{.UserCode}}" autocomplete="one-time-code" required autofocus>
+        </label>
+        <label>
+          Client name
+          <input name="client_name" value="MiniClaude CLI" required>
+        </label>
+        <button type="submit">Approve device</button>
+      </form>
+    {{end}}
+  </main>
+</body>
+</html>

@@ -38,6 +38,8 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /dashboard", s.dashboardPage)
 	s.mux.HandleFunc("GET /providers", s.providersPage)
 	s.mux.HandleFunc("GET /clients", s.clientsPage)
+	s.mux.HandleFunc("GET /device", s.devicePage)
+	s.mux.HandleFunc("POST /device", s.deviceApproveForm)
 	s.mux.HandleFunc("GET /web/static/", s.staticFile)
 	s.mux.HandleFunc("POST /ui/login", s.loginForm)
 	s.mux.HandleFunc("POST /ui/signup", s.signupForm)

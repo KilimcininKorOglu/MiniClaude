@@ -4,6 +4,7 @@ import (
 	"embed"
 	"html/template"
 	"net/http"
+	"net/url"
 
 	"github.com/KilimcininKorOglu/MiniClaude/sync-server/internal/auth"
 )
@@ -15,6 +16,9 @@ type pageData struct {
 	Title     string
 	Principal auth.Principal
 	Error     string
+	Next      string
+	UserCode  string
+	ClientID  string
 }
 
 func (s *Server) templates() (*template.Template, error) {
@@ -47,11 +51,15 @@ func (s *Server) homePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) loginPage(w http.ResponseWriter, r *http.Request) {
+	next := safeNextPath(r.URL.Query().Get("next"))
 	if _, ok := s.currentPrincipal(r); ok {
-		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+		if next == "" {
+			next = "/dashboard"
+		}
+		http.Redirect(w, r, next, http.StatusSeeOther)
 		return
 	}
-	s.render(w, http.StatusOK, "login.html", pageData{Title: "Login"})
+	s.render(w, http.StatusOK, "login.html", pageData{Title: "Login", Next: next})
 }
 
 func (s *Server) signupPage(w http.ResponseWriter, r *http.Request) {
@@ -86,6 +94,15 @@ func (s *Server) clientsPage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, http.StatusOK, "clients.html", pageData{Title: "Clients", Principal: principal})
 }
 
+func (s *Server) devicePage(w http.ResponseWriter, r *http.Request) {
+	principal, ok := s.currentPrincipal(r)
+	if !ok {
+		http.Redirect(w, r, "/login?next="+url.QueryEscape(r.URL.RequestURI()), http.StatusSeeOther)
+		return
+	}
+	s.render(w, http.StatusOK, "device.html", pageData{Title: "Link device", Principal: principal, UserCode: r.URL.Query().Get("user_code")})
+}
+
 func (s *Server) favicon(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -101,6 +118,13 @@ func (s *Server) requireHTMLAuth(w http.ResponseWriter, r *http.Request) (auth.P
 		return auth.Principal{}, false
 	}
 	return principal, true
+}
+
+func safeNextPath(next string) string {
+	if len(next) == 0 || next[0] != '/' || (len(next) > 1 && next[1] == '/') {
+		return ""
+	}
+	return next
 }
 
 func (s *Server) currentPrincipal(r *http.Request) (auth.Principal, bool) {

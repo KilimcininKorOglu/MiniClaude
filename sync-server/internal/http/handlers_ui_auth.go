@@ -16,17 +16,21 @@ func (s *Server) loginForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	next := safeNextPath(r.FormValue("next"))
 	session, err := s.authService.Login(r.Context(), auth.LoginRequest{
 		Login:    r.FormValue("login"),
 		Password: r.FormValue("password"),
 	})
 	if err != nil {
-		s.render(w, http.StatusUnauthorized, "login.html", pageData{Title: "Login", Error: "Invalid credentials."})
+		s.render(w, http.StatusUnauthorized, "login.html", pageData{Title: "Login", Error: "Invalid credentials.", Next: next})
 		return
 	}
 
 	auth.SetSessionCookie(w, session.Token, session.ExpiresAt, s.cookies)
-	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+	if next == "" {
+		next = "/dashboard"
+	}
+	http.Redirect(w, r, next, http.StatusSeeOther)
 }
 
 func (s *Server) signupForm(w http.ResponseWriter, r *http.Request) {
