@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: miniclaude
+      POSTGRES_PASSWORD: miniclaude
+      POSTGRES_DB: miniclaude_sync
+    ports:
+      - "5432:5432"
+    volumes:
+      - sync_server_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U miniclaude -d miniclaude_sync"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build: .
+    environment:
+      SYNC_SERVER_ADDR: :8080
+      SYNC_SERVER_APP_URL: http://localhost:8080
+      SYNC_SERVER_COOKIE_SECURE: "false"
+      SYNC_SERVER_MIGRATIONS_DIR: /app/migrations
+      DATABASE_URL: postgres://miniclaude:miniclaude@postgres:5432/miniclaude_sync?sslmode=disable
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  sync_server_postgres:

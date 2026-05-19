@@ -56,6 +56,11 @@ deletion-log.md
 coverage/
 .nyc_output/
 
+# Sync server artifacts
+sync-server/bin/
+sync-server/tmp/
+sync-server/*.test
+
 # Debug files
 *.tsbuildinfo
 

@@ -1,0 +1,13 @@
+drop table if exists audit_events;
+drop table if exists device_login_requests;
+drop table if exists client_sessions;
+drop table if exists clients;
+drop table if exists provider_secrets;
+drop table if exists provider_configs;
+drop table if exists settings_events;
+drop table if exists settings_documents;
+drop table if exists web_sessions;
+drop table if exists workspace_members;
+drop table if exists workspaces;
+drop table if exists users;
+drop extension if exists pgcrypto;
