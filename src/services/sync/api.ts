@@ -1,4 +1,8 @@
-import type { DevicePollResponse, DeviceStartResponse } from './types.js'
+import type {
+  DevicePollResponse,
+  DeviceStartResponse,
+  SettingsPushResponse,
+} from './types.js'
 
 function normalizeServerURL(serverURL: string): string {
   return serverURL.replace(/\/+$/, '')
@@ -8,10 +12,14 @@ function endpoint(serverURL: string, path: string): string {
   return `${normalizeServerURL(serverURL)}${path}`
 }
 
-async function postJSON<T>(url: string, body: unknown): Promise<T> {
+async function postJSON<T>(
+  url: string,
+  body: unknown,
+  headers: Record<string, string> = {},
+): Promise<T> {
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', ...headers },
     body: JSON.stringify(body),
   })
   if (!response.ok) {
@@ -37,6 +45,27 @@ export async function pollDeviceLogin(
   return postJSON<DevicePollResponse>(endpoint(serverURL, '/api/device/poll'), {
     device_code: deviceCode,
   })
+}
+
+export async function pushSettings(
+  serverURL: string,
+  accessToken: string,
+  baseVersion: number,
+  document: Record<string, unknown>,
+): Promise<SettingsPushResponse> {
+  const response = await fetch(endpoint(serverURL, '/api/settings/push'), {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ base_version: baseVersion, document }),
+  })
+  if (!response.ok && response.status !== 409) {
+    const message = await response.text()
+    throw new Error(message || `Request failed with HTTP ${response.status}`)
+  }
+  return (await response.json()) as SettingsPushResponse
 }
 
 export function syncWebSocketURL(serverURL: string, accessToken: string): string {

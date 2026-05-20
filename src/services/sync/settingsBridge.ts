@@ -6,7 +6,7 @@ import { jsonStringify } from '../../utils/slowOperations.js'
 import { markInternalWrite } from '../../utils/settings/internalWrites.js'
 import {
   getSettingsFilePathForSource,
-  getSettingsForSource,
+  parseSettingsFile,
 } from '../../utils/settings/settings.js'
 import { resetSettingsCache } from '../../utils/settings/settingsCache.js'
 import { loadSyncCredentials, updateSyncCredentials } from './credentials.js'
@@ -14,6 +14,8 @@ import type { SettingsSnapshot } from './types.js'
 
 type LocalSettingsPush = {
   checksum: string
+  baseVersion: number
+  document: Record<string, unknown>
   message: Record<string, unknown>
 }
 
@@ -43,24 +45,43 @@ export function applySettingsSnapshot(snapshot: SettingsSnapshot): Error | null 
 export function localSettingsPushMessage(): LocalSettingsPush | null {
   const credentials = loadSyncCredentials()
   if (!credentials) return null
-  const document = getSettingsForSource('userSettings') ?? {}
+  const document = readUserSettingsDocument()
+  if (!document) return null
+  const baseVersion = credentials.settingsVersion ?? 0
   return {
     checksum: checksumDocument(document),
+    baseVersion,
+    document,
     message: {
       type: 'settings_push',
-      base_version: credentials.settingsVersion ?? 0,
+      base_version: baseVersion,
       document,
     },
   }
 }
 
 export function localSettingsChecksum(): string | null {
-  const document = getSettingsForSource('userSettings') ?? {}
+  const document = readUserSettingsDocument()
+  if (!document) return null
   return checksumDocument(document)
 }
 
 export function settingsFilePath(): string | null {
   return getSettingsFilePathForSource('userSettings') ?? null
+}
+
+function readUserSettingsDocument(): Record<string, unknown> | null {
+  const filePath = settingsFilePath()
+  if (!filePath) return null
+  if (!getFsImplementation().existsSync(filePath)) return {}
+  const result = parseSettingsFile(filePath)
+  if (!result.settings) {
+    const message = result.errors.length > 0
+      ? result.errors.map(error => `${error.path}: ${error.message}`).join('; ')
+      : `Unable to read ${filePath}`
+    throw new Error(`Cannot sync invalid user settings: ${message}`)
+  }
+  return result.settings
 }
 
 export function snapshotFromPayload(payload: unknown): SettingsSnapshot | null {

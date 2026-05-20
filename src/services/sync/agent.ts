@@ -3,7 +3,7 @@ import { watch, type FSWatcher } from 'fs'
 import { logError } from '../../utils/log.js'
 import { getFsImplementation } from '../../utils/fsOperations.js'
 import { resetSettingsCache } from '../../utils/settings/settingsCache.js'
-import { syncWebSocketURL } from './api.js'
+import { pushSettings, syncWebSocketURL } from './api.js'
 import {
   deleteSyncCredentials,
   loadSyncCredentials,
@@ -41,10 +41,15 @@ export function startSyncAgent(): void {
 }
 
 export function pushLocalSettingsNow(): Error | null {
-  const push = localSettingsPushMessage()
+  let push: ReturnType<typeof localSettingsPushMessage>
+  try {
+    push = localSettingsPushMessage()
+  } catch (error) {
+    return error instanceof Error ? error : new Error(String(error))
+  }
   if (!push) return null
   if (!activeSocket || activeSocket.readyState !== WebSocket.OPEN) {
-    scheduleLocalSettingsPush()
+    void sendLocalSettingsPushFallback(push)
     return null
   }
   return sendLocalSettingsPush(push)
@@ -93,6 +98,9 @@ function connect(credentials: SyncCredentials): void {
         }
         const snapshot = snapshotFromPayload(message.payload)
         if (!snapshot) return
+        if (message.type === 'version_reject') {
+          notifySettingsConflict()
+        }
         lastSentSettingsChecksum = null
         const error = applySettingsSnapshot(snapshot)
         if (error) logError(error)
@@ -139,11 +147,20 @@ function scheduleLocalSettingsPush(): void {
   settingsPushTimer = setTimeout(() => {
     settingsPushTimer = null
     const credentials = loadSyncCredentials()
-    const push = localSettingsPushMessage()
+    let push: ReturnType<typeof localSettingsPushMessage>
+    try {
+      push = localSettingsPushMessage()
+    } catch (error) {
+      logError(error)
+      return
+    }
     if (!credentials || !push) return
     if (credentials.settingsChecksum === push.checksum) return
     if (lastSentSettingsChecksum === push.checksum) return
-    if (!activeSocket || activeSocket.readyState !== WebSocket.OPEN) return
+    if (!activeSocket || activeSocket.readyState !== WebSocket.OPEN) {
+      void sendLocalSettingsPushFallback(push)
+      return
+    }
     const error = sendLocalSettingsPush(push)
     if (error) logError(error)
   }, settingsPushDebounceMs)
@@ -157,6 +174,30 @@ function sendLocalSettingsPush(push: ReturnType<typeof localSettingsPushMessage>
     return null
   } catch (error) {
     return error instanceof Error ? error : new Error(String(error))
+  }
+}
+
+async function sendLocalSettingsPushFallback(
+  push: ReturnType<typeof localSettingsPushMessage>,
+): Promise<void> {
+  if (!push) return
+  const credentials = loadSyncCredentials()
+  if (!credentials) return
+  try {
+    const response = await pushSettings(
+      credentials.serverURL,
+      credentials.accessToken,
+      push.baseVersion,
+      push.document,
+    )
+    if (!response.accepted || response.type === 'version_reject') {
+      notifySettingsConflict()
+    }
+    lastSentSettingsChecksum = null
+    const error = applySettingsSnapshot(response)
+    if (error) logError(error)
+  } catch (error) {
+    logError(error)
   }
 }
 
@@ -213,6 +254,12 @@ function terminateIfTargeted(payload: unknown): void {
     })
   }
   notifyTermination(value.reason, clientRevoked)
+}
+
+function notifySettingsConflict(): void {
+  process.stderr.write(
+    '\nMiniClaude sync settings conflict detected. The latest server settings snapshot was applied.\n',
+  )
 }
 
 function notifyTermination(reason: unknown, clientRevoked: boolean): void {

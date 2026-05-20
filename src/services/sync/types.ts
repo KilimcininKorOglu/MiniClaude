@@ -21,6 +21,11 @@ export type SettingsSnapshot = {
   checksum: string
 }
 
+export type SettingsPushResponse = SettingsSnapshot & {
+  type: 'settings_applied' | 'version_reject'
+  accepted: boolean
+}
+
 export type SyncCredentials = {
   serverURL: string
   clientID: string
