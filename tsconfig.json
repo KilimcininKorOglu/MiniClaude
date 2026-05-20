@@ -17,6 +17,7 @@
     "noEmit": true,
     "strict": false,
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src", "scripts", "env.d.ts"]
