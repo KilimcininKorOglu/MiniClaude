@@ -5,6 +5,7 @@ dist/
 openclaw/
 
 # Build artifacts
+/bin/
 *.exe
 cli.exe
 cli-dev.exe

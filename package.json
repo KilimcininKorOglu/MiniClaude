@@ -6,8 +6,8 @@
   "type": "module",
   "packageManager": "bun@1.3.11",
   "bin": {
-    "miniclaude": "./cli",
-    "mclaude": "./cli"
+    "miniclaude": "./bin/cli",
+    "mclaude": "./bin/cli"
   },
   "engines": {
     "bun": ">=1.3.11"

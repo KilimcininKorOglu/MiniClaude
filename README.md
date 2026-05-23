@@ -41,7 +41,7 @@ The project is local-first by default. An optional self-hosted sync server is in
 - **Claude Code-style workflow**: interactive chat, code generation, file editing, shell commands, Git helpers, MCP, plugins, skills, hooks, and permissions remain available.
 - **Multi-provider configuration**: switch between compatible Anthropic-style endpoints from `settings.json` without restarting the CLI.
 - **Optional self-hosted sync**: link clients to the included Go + HTMX + PostgreSQL sync server when workspace-scoped settings sync is needed.
-- **Simple build path**: install dependencies with Bun and build a local executable at `./cli`.
+- **Simple build path**: install dependencies with Bun and build a local executable at `./bin/cli`.
 
 ---
 
@@ -70,7 +70,7 @@ bun run build
 Run the built CLI:
 
 ```bash
-./cli
+./bin/cli
 ```
 
 Development mode runs the TypeScript entrypoint directly:
@@ -219,9 +219,9 @@ See [`sync-server/README.md`](sync-server/README.md) for deployment, Coolify con
 |--------------------------------------------------------------|--------------------------------------------------------------|
 | `bun install`                                                | Installs root dependencies                                   |
 | `bun run dev`                                                | Runs `src/entrypoints/cli.tsx` directly                      |
-| `bun run build`                                              | Bundles the CLI to `./cli`                                   |
-| `bun run build:dev`                                          | Builds `./cli` with development defines and version metadata |
-| `bun run compile`                                            | Creates a compiled Bun executable at `./dist/cli`            |
+| `bun run build`                                              | Bundles the CLI to `./bin/cli`                               |
+| `bun run build:dev`                                          | Builds `./bin/cli` with development metadata                 |
+| `bun run compile`                                            | Creates a compiled Bun executable at `./bin/cli`             |
 | `bun run scripts/test-p0-features.ts`                        | Runs the existing P0 smoke checks                            |
 | `cd website && bun run build`                                | Builds the documentation website                             |
 | `cd sync-server && go test ./...`                            | Runs sync-server tests                                       |

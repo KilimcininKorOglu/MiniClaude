@@ -105,13 +105,7 @@ for (let i = 0; i < args.length; i += 1) {
 }
 const features = [...featureSet]
 
-const outfile = compile
-  ? dev
-    ? './dist/cli'
-    : './dist/cli'
-  : dev
-    ? './cli'
-    : './cli'
+const outfile = './bin/cli'
 const buildTime = new Date().toISOString()
 const version = dev ? getDevVersion(pkg.version) : pkg.version
 
@@ -158,7 +152,7 @@ const cmd = [
   'bun',
   'build',
   './src/entrypoints/cli.tsx',
-  ...(compile ? ['--compile', '--bytecode'] : []),
+  ...(compile ? ['--compile'] : []),
   '--target',
   'bun',
   '--format',
